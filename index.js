@@ -1,0 +1,110 @@
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+
+// Load environment variables first
+dotenv.config();
+console.log('Environment variables loaded');
+
+// Import routes after environment variables are loaded
+import authRoutes from './src/routes/auth.route.js';
+import profileRoutes from './src/routes/profile.route.js';
+import serviceRoutes from './src/routes/service.route.js';
+import galleryRoutes from './src/routes/gallery.route.js';
+import productRoutes from './src/routes/product.route.js';
+import testimonialRoutes from './src/routes/testimonial.route.js';
+import appointmentRoutes from './src/routes/appointment.route.js';
+import passwordRoutes from './src/routes/password.route.js';
+
+console.log('Routes imported successfully');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Database connection
+import dbConnect from './src/config/mongodb.js';
+dbConnect();
+
+app.use(cors());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Routes
+app.use('/api/auth', authRoutes);
+console.log('Auth routes registered');
+app.use('/api/profile', profileRoutes);
+console.log('Profile routes registered');
+app.use('/api/services', serviceRoutes);
+console.log('Services routes registered');
+app.use('/api/gallery', galleryRoutes);
+console.log('Gallery routes registered');
+app.use('/api/products', productRoutes);
+console.log('Products routes registered');
+app.use('/api/testimonials', testimonialRoutes);
+console.log('Testimonials routes registered');
+app.use('/api/appointments', appointmentRoutes);
+console.log('Appointments routes registered');
+app.use('/api/password', passwordRoutes);
+console.log('Password routes registered');
+
+app.get('/', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Elite Jobs Backend API is running!',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Debug route to check if routes are registered
+app.get('/api/debug/routes', (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: 'Routes are registered',
+    routes: [
+      '/api/auth',
+      '/api/profile',
+      '/api/services',
+      '/api/gallery',
+      '/api/products',
+      '/api/testimonials',
+      '/api/appointments',
+      '/api/password'
+    ]
+  });
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Unhandled error:', err.stack);
+  res.status(500).json({
+    success: false,
+    message: 'Something went wrong!',
+    error: err.message || {}
+  });
+});
+
+// 404 handler - This should be the last middleware
+app.use((req, res) => {
+  console.log('Route not found:', req.method, req.url);
+  console.log('Request headers:', req.headers);
+  console.log('Request body:', req.body);
+  
+  // Log all registered routes for debugging
+  console.log('Registered routes:');
+  app._router.stack.forEach((middleware, i) => {
+    if (middleware.route) {
+      console.log(`  ${middleware.route.stack[0].method.toUpperCase()} ${middleware.route.path}`);
+    } else if (middleware.name === 'router') {
+      console.log(`  Router middleware at path: ${middleware.regexp}`);
+    }
+  });
+  
+  res.status(404).json({
+    success: false,
+    message: 'Route not found'
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
