@@ -50,7 +50,7 @@ console.log('Password routes registered');
 app.get('/', (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Elite Jobs Backend API is running!',
+    message: 'Elite Digital Cards Backend API is running!',
     timestamp: new Date().toISOString()
   });
 });
