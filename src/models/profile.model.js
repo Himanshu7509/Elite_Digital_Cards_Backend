@@ -50,6 +50,10 @@ const profileSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  templateId: {
+    type: String,
+    default: "template1"
+  },
   profileImg: {
     type: String, // S3 URL
     trim: true

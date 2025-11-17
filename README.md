@@ -178,7 +178,8 @@ A comprehensive backend API for digital business cards with authentication, prof
       "whatsapp": "+1234567890"
     },
     "websiteLink": "https://johndoe.com",
-    "appLink": "https://app.johndoe.com"
+    "appLink": "https://app.johndoe.com",
+    "templateId": "template1"
   }
   ```
 
@@ -238,6 +239,7 @@ A comprehensive backend API for digital business cards with authentication, prof
       },
       "websiteLink": "https://johndoe.com",
       "appLink": "https://app.johndoe.com",
+      "templateId": "template1",
       "profileImg": "https://bucket.s3.region.amazonaws.com/elite-cards/profileImg/image.jpg",
       "bannerImg": "https://bucket.s3.region.amazonaws.com/elite-cards/bannerImg/image.jpg",
       "createdAt": "2023-01-01T00:00:00.000Z",
@@ -268,7 +270,8 @@ A comprehensive backend API for digital business cards with authentication, prof
       "whatsapp": "+1234567890"
     },
     "websiteLink": "https://johndoe.com",
-    "appLink": "https://app.johndoe.com"
+    "appLink": "https://app.johndoe.com",
+    "templateId": "template3"
   }
   ```
 

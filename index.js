@@ -83,6 +83,7 @@ app.use((err, req, res, next) => {
   });
 });
 
+
 // 404 handler - This should be the last middleware
 app.use((req, res) => {
   console.log('Route not found:', req.method, req.url);

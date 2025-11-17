@@ -237,11 +237,11 @@ const getMyProfile = async (req, res) => {
 // Update client's own profile
 const updateMyProfile = async (req, res) => {
   try {
-    const { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink } = req.body;
+    const { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink, templateId } = req.body;
 
     const profile = await Profile.findOneAndUpdate(
       { userId: req.user.id },
-      { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink },
+      { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink, templateId },
       { new: true, runValidators: true }
     );
 
@@ -360,7 +360,7 @@ const getClientProfile = async (req, res) => {
 const updateClientProfile = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink } = req.body;
+    const { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink, templateId } = req.body;
 
     // Check if user exists and is a client
     const user = await User.findById(id);
@@ -373,7 +373,7 @@ const updateClientProfile = async (req, res) => {
 
     const profile = await Profile.findOneAndUpdate(
       { userId: id },
-      { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink },
+      { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink, templateId },
       { new: true, runValidators: true }
     ).populate('userId', 'email role');
 
