@@ -51,7 +51,7 @@ const deleteImageFromS3 = async (imageUrl) => {
 // Create client profile
 const createProfile = async (req, res) => {
   try {
-    const { name, profession, about, phone1, phone2, location, dob, socialMedia } = req.body;
+    const { name, profession, about, phone1, phone2, location, dob, socialMedia, profileImg, bannerImg } = req.body;
 
     // Check if profile already exists for this user
     const existingProfile = await Profile.findOne({ userId: req.user.id });
@@ -62,7 +62,7 @@ const createProfile = async (req, res) => {
       });
     }
 
-    // Create new profile
+    // Create new profile with optional image URLs
     const profile = new Profile({
       userId: req.user.id,
       name,
@@ -72,7 +72,9 @@ const createProfile = async (req, res) => {
       phone2,
       location,
       dob,
-      socialMedia
+      socialMedia,
+      ...(profileImg && { profileImg }),
+      ...(bannerImg && { bannerImg })
     });
 
     await profile.save();
@@ -113,11 +115,13 @@ const uploadProfileImage = async (req, res) => {
     const currentProfile = await Profile.findOne({ userId: req.user.id });
     
     if (!currentProfile) {
-      // If profile doesn't exist, delete the uploaded image
-      await deleteImageFromS3(imageUrl);
-      return res.status(404).json({
-        success: false,
-        message: 'Profile not found'
+      // If profile doesn't exist, we'll return the image URL so it can be used when creating the profile
+      return res.status(200).json({
+        success: true,
+        message: 'Profile image uploaded successfully',
+        data: {
+          profileImg: imageUrl
+        }
       });
     }
 
@@ -172,11 +176,13 @@ const uploadBannerImage = async (req, res) => {
     const currentProfile = await Profile.findOne({ userId: req.user.id });
     
     if (!currentProfile) {
-      // If profile doesn't exist, delete the uploaded image
-      await deleteImageFromS3(imageUrl);
-      return res.status(404).json({
-        success: false,
-        message: 'Profile not found'
+      // If profile doesn't exist, we'll return the image URL so it can be used when creating the profile
+      return res.status(200).json({
+        success: true,
+        message: 'Banner image uploaded successfully',
+        data: {
+          bannerImg: imageUrl
+        }
       });
     }
 
