@@ -51,6 +51,25 @@ const getMyAppointments = async (req, res) => {
   }
 };
 
+// Get public appointments by user ID
+const getPublicAppointments = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const appointments = await Appointment.find({ userId: userId }).sort({ appointmentDate: 1 });
+    
+    res.status(200).json({
+      success: true,
+      data: appointments
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching appointments',
+      error: error.message
+    });
+  }
+};
+
 // Get appointment by ID
 const getAppointmentById = async (req, res) => {
   try {
@@ -246,6 +265,7 @@ const deleteAdminAppointment = async (req, res) => {
 export {
   createAppointment,
   getMyAppointments,
+  getPublicAppointments,
   getAppointmentById,
   updateAppointment,
   deleteAppointment,

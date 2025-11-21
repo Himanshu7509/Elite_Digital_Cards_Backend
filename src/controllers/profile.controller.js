@@ -234,6 +234,53 @@ const getMyProfile = async (req, res) => {
   }
 };
 
+// Get public profile (read-only access for anyone)
+const getPublicProfile = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Find profile by userId
+    const profile = await Profile.findOne({ userId }).populate('userId', 'email role');
+    
+    if (!profile) {
+      return res.status(404).json({
+        success: false,
+        message: 'Profile not found'
+      });
+    }
+
+    // Return only non-sensitive profile data
+    const publicProfile = {
+      name: profile.name,
+      profession: profile.profession,
+      about: profile.about,
+      phone1: profile.phone1,
+      phone2: profile.phone2,
+      location: profile.location,
+      dob: profile.dob,
+      socialMedia: profile.socialMedia,
+      websiteLink: profile.websiteLink,
+      appLink: profile.appLink,
+      templateId: profile.templateId,
+      profileImg: profile.profileImg,
+      bannerImg: profile.bannerImg,
+      createdAt: profile.createdAt,
+      updatedAt: profile.updatedAt
+    };
+
+    res.status(200).json({
+      success: true,
+      data: publicProfile
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching profile',
+      error: error.message
+    });
+  }
+};
+
 // Update client's own profile
 const updateMyProfile = async (req, res) => {
   try {
@@ -451,6 +498,7 @@ export {
   uploadProfileImage,
   uploadBannerImage,
   getMyProfile,
+  getPublicProfile,
   updateMyProfile,
   deleteMyProfile,
   getAllProfiles,

@@ -2,6 +2,7 @@ import express from 'express';
 import { 
   uploadGalleryImage,
   getMyGallery,
+  getPublicGallery,
   getGalleryItemById,
   updateGalleryItem,
   deleteGalleryItem,
@@ -18,6 +19,7 @@ const router = express.Router();
 // Client routes (protected)
 router.post('/upload', authMiddleware, upload.single('image'), uploadGalleryImage);
 router.get('/my', authMiddleware, getMyGallery);
+router.get('/public/:userId', getPublicGallery);
 router.get('/:id', authMiddleware, getGalleryItemById);
 router.put('/:id', authMiddleware, updateGalleryItem);
 router.delete('/:id', authMiddleware, deleteGalleryItem);

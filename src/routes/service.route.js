@@ -2,6 +2,7 @@ import express from 'express';
 import { 
   createService,
   getMyServices,
+  getPublicServices,
   getServiceById,
   updateService,
   deleteService,
@@ -17,6 +18,7 @@ const router = express.Router();
 // Client routes (protected)
 router.post('/', authMiddleware, createService);
 router.get('/my', authMiddleware, getMyServices);
+router.get('/public/:userId', getPublicServices);
 router.get('/:id', authMiddleware, getServiceById);
 router.put('/:id', authMiddleware, updateService);
 router.delete('/:id', authMiddleware, deleteService);

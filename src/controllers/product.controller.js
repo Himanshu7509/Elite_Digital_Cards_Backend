@@ -100,6 +100,25 @@ const getMyProducts = async (req, res) => {
   }
 };
 
+// Get public products by user ID
+const getPublicProducts = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const products = await Product.find({ userId: userId });
+    
+    res.status(200).json({
+      success: true,
+      data: products
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching products',
+      error: error.message
+    });
+  }
+};
+
 // Get product by ID
 const getProductById = async (req, res) => {
   try {
@@ -335,6 +354,7 @@ const deleteAdminProduct = async (req, res) => {
 export {
   createProduct,
   getMyProducts,
+  getPublicProducts,
   getProductById,
   updateProduct,
   deleteProduct,

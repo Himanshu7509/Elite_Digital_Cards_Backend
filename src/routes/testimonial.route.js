@@ -2,6 +2,7 @@ import express from 'express';
 import { 
   createTestimonial,
   getMyTestimonials,
+  getPublicTestimonials,
   getTestimonialById,
   updateTestimonial,
   deleteTestimonial,
@@ -17,6 +18,7 @@ const router = express.Router();
 // Client routes (protected)
 router.post('/', authMiddleware, createTestimonial);
 router.get('/my', authMiddleware, getMyTestimonials);
+router.get('/public/:userId', getPublicTestimonials);
 router.get('/:id', authMiddleware, getTestimonialById);
 router.put('/:id', authMiddleware, updateTestimonial);
 router.delete('/:id', authMiddleware, deleteTestimonial);

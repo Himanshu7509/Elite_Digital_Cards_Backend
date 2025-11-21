@@ -76,6 +76,26 @@ const getServiceById = async (req, res) => {
   }
 };
 
+// Get public services by user ID
+const getPublicServices = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const services = await Service.find({ userId: userId });
+    
+    res.status(200).json({
+      success: true,
+      data: services
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching services',
+      error: error.message
+    });
+  }
+};
+
 // Update service
 const updateService = async (req, res) => {
   try {
@@ -244,6 +264,7 @@ const deleteAdminService = async (req, res) => {
 export {
   createService,
   getMyServices,
+  getPublicServices,
   getServiceById,
   updateService,
   deleteService,

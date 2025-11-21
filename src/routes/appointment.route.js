@@ -2,6 +2,7 @@ import express from 'express';
 import { 
   createAppointment,
   getMyAppointments,
+  getPublicAppointments,
   getAppointmentById,
   updateAppointment,
   deleteAppointment,
@@ -17,6 +18,7 @@ const router = express.Router();
 // Client routes (protected)
 router.post('/', authMiddleware, createAppointment);
 router.get('/my', authMiddleware, getMyAppointments);
+router.get('/public/:userId', getPublicAppointments);
 router.get('/:id', authMiddleware, getAppointmentById);
 router.put('/:id', authMiddleware, updateAppointment);
 router.delete('/:id', authMiddleware, deleteAppointment);

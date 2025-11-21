@@ -2,6 +2,7 @@ import express from 'express';
 import { 
   createProduct,
   getMyProducts,
+  getPublicProducts,
   getProductById,
   updateProduct,
   deleteProduct,
@@ -18,6 +19,7 @@ const router = express.Router();
 // Client routes (protected)
 router.post('/upload', authMiddleware, upload.single('productPhoto'), createProduct);
 router.get('/my', authMiddleware, getMyProducts);
+router.get('/public/:userId', getPublicProducts);
 router.get('/:id', authMiddleware, getProductById);
 router.put('/:id', authMiddleware, upload.single('productPhoto'), updateProduct);
 router.delete('/:id', authMiddleware, deleteProduct);

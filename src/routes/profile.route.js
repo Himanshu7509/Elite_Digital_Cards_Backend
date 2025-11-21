@@ -4,6 +4,7 @@ import {
   uploadProfileImage,
   uploadBannerImage,
   getMyProfile,
+  getPublicProfile,
   updateMyProfile,
   deleteMyProfile,
   getAllProfiles,
@@ -25,6 +26,9 @@ router.put('/upload/banner-image', authMiddleware, upload.single('bannerImg'), u
 router.get('/me', authMiddleware, getMyProfile);
 router.put('/me', authMiddleware, updateMyProfile);
 router.delete('/me', authMiddleware, deleteMyProfile);
+
+// Public route (no authentication required)
+router.get('/public/:userId', getPublicProfile);
 
 // Admin routes (protected + admin authorization)
 router.get('/', authMiddleware, adminAuth, getAllProfiles);

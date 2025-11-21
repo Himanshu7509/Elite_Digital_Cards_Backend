@@ -49,6 +49,25 @@ const getMyTestimonials = async (req, res) => {
   }
 };
 
+// Get public testimonials by user ID
+const getPublicTestimonials = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const testimonials = await Testimonial.find({ userId: userId });
+    
+    res.status(200).json({
+      success: true,
+      data: testimonials
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching testimonials',
+      error: error.message
+    });
+  }
+};
+
 // Get testimonial by ID
 const getTestimonialById = async (req, res) => {
   try {
@@ -244,6 +263,7 @@ const deleteAdminTestimonial = async (req, res) => {
 export {
   createTestimonial,
   getMyTestimonials,
+  getPublicTestimonials,
   getTestimonialById,
   updateTestimonial,
   deleteTestimonial,

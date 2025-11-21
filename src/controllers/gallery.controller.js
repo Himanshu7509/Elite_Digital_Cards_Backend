@@ -99,6 +99,25 @@ const getMyGallery = async (req, res) => {
   }
 };
 
+// Get public gallery images by user ID
+const getPublicGallery = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const galleryItems = await Gallery.find({ userId: userId });
+    
+    res.status(200).json({
+      success: true,
+      data: galleryItems
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching gallery',
+      error: error.message
+    });
+  }
+};
+
 // Get gallery image by ID
 const getGalleryItemById = async (req, res) => {
   try {
@@ -308,6 +327,7 @@ const deleteAdminGalleryItem = async (req, res) => {
 export {
   uploadGalleryImage,
   getMyGallery,
+  getPublicGallery,
   getGalleryItemById,
   updateGalleryItem,
   deleteGalleryItem,
