@@ -50,6 +50,10 @@ const profileSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
+  gmail: {
+    type: String,
+    trim: true
+  },
   templateId: {
     type: String,
     default: "template1"

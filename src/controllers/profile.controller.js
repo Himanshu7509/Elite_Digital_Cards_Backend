@@ -51,7 +51,7 @@ const deleteImageFromS3 = async (imageUrl) => {
 // Create client profile
 const createProfile = async (req, res) => {
   try {
-    const { name, profession, about, phone1, phone2, location, dob, socialMedia, profileImg, bannerImg } = req.body;
+    const { name, profession, about, phone1, phone2, location, dob, socialMedia, profileImg, bannerImg, gmail } = req.body;
 
     // Check if profile already exists for this user
     const existingProfile = await Profile.findOne({ userId: req.user.id });
@@ -73,16 +73,26 @@ const createProfile = async (req, res) => {
       location,
       dob,
       socialMedia,
+      ...(gmail && { gmail }),
       ...(profileImg && { profileImg }),
       ...(bannerImg && { bannerImg })
     });
 
     await profile.save();
 
+    // Populate user data to include email
+    await profile.populate('userId', 'email');
+
+    // Add email to the response
+    const profileData = {
+      ...profile.toObject(),
+      email: profile.userId?.email
+    };
+
     res.status(201).json({
       success: true,
       message: 'Profile created successfully',
-      data: profile
+      data: profileData
     });
   } catch (error) {
     res.status(500).json({
@@ -135,14 +145,18 @@ const uploadProfileImage = async (req, res) => {
       { userId: req.user.id },
       { profileImg: imageUrl },
       { new: true }
-    );
+    ).populate('userId', 'email');
+
+    // Add email to the response
+    const profileData = {
+      profileImg: imageUrl,
+      email: profile?.userId?.email
+    };
 
     res.status(200).json({
       success: true,
       message: 'Profile image uploaded successfully',
-      data: {
-        profileImg: imageUrl
-      }
+      data: profileData
     });
   } catch (error) {
     console.error('Error uploading profile image:', error);
@@ -196,14 +210,18 @@ const uploadBannerImage = async (req, res) => {
       { userId: req.user.id },
       { bannerImg: imageUrl },
       { new: true }
-    );
+    ).populate('userId', 'email');
+
+    // Add email to the response
+    const profileData = {
+      bannerImg: imageUrl,
+      email: profile?.userId?.email
+    };
 
     res.status(200).json({
       success: true,
       message: 'Banner image uploaded successfully',
-      data: {
-        bannerImg: imageUrl
-      }
+      data: profileData
     });
   } catch (error) {
     console.error('Error uploading banner image:', error);
@@ -218,7 +236,7 @@ const uploadBannerImage = async (req, res) => {
 // Get client's own profile
 const getMyProfile = async (req, res) => {
   try {
-    const profile = await Profile.findOne({ userId: req.user.id });
+    const profile = await Profile.findOne({ userId: req.user.id }).populate('userId', 'email');
     
     if (!profile) {
       return res.status(404).json({
@@ -227,9 +245,15 @@ const getMyProfile = async (req, res) => {
       });
     }
 
+    // Add email to the profile data
+    const profileData = {
+      ...profile.toObject(),
+      email: profile.userId?.email
+    };
+
     res.status(200).json({
       success: true,
-      data: profile
+      data: profileData
     });
   } catch (error) {
     res.status(500).json({
@@ -267,9 +291,11 @@ const getPublicProfile = async (req, res) => {
       socialMedia: profile.socialMedia,
       websiteLink: profile.websiteLink,
       appLink: profile.appLink,
+      gmail: profile.gmail,
       templateId: profile.templateId,
       profileImg: profile.profileImg,
       bannerImg: profile.bannerImg,
+      email: profile.userId?.email,
       createdAt: profile.createdAt,
       updatedAt: profile.updatedAt
     };
@@ -290,13 +316,13 @@ const getPublicProfile = async (req, res) => {
 // Update client's own profile
 const updateMyProfile = async (req, res) => {
   try {
-    const { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink, templateId } = req.body;
+    const { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink, templateId, gmail } = req.body;
 
     const profile = await Profile.findOneAndUpdate(
       { userId: req.user.id },
-      { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink, templateId },
+      { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink, templateId, ...(gmail && { gmail }) },
       { new: true, runValidators: true }
-    );
+    ).populate('userId', 'email');
 
     if (!profile) {
       return res.status(404).json({
@@ -305,10 +331,16 @@ const updateMyProfile = async (req, res) => {
       });
     }
 
+    // Add email to the response
+    const profileData = {
+      ...profile.toObject(),
+      email: profile.userId?.email
+    };
+
     res.status(200).json({
       success: true,
       message: 'Profile updated successfully',
-      data: profile
+      data: profileData
     });
   } catch (error) {
     res.status(500).json({
@@ -360,9 +392,15 @@ const getAllProfiles = async (req, res) => {
   try {
     const profiles = await Profile.find().populate('userId', 'email role');
     
+    // Add email to each profile data
+    const profilesData = profiles.map(profile => ({
+      ...profile.toObject(),
+      email: profile.userId?.email
+    }));
+    
     res.status(200).json({
       success: true,
-      data: profiles
+      data: profilesData
     });
   } catch (error) {
     res.status(500).json({
@@ -396,9 +434,15 @@ const getClientProfile = async (req, res) => {
       });
     }
 
+    // Add email to the profile data
+    const profileData = {
+      ...profile.toObject(),
+      email: profile.userId?.email
+    };
+
     res.status(200).json({
       success: true,
-      data: profile
+      data: profileData
     });
   } catch (error) {
     res.status(500).json({
@@ -413,7 +457,7 @@ const getClientProfile = async (req, res) => {
 const updateClientProfile = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink, templateId } = req.body;
+    const { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink, templateId, gmail } = req.body;
 
     // Check if user exists and is a client
     const user = await User.findById(id);
@@ -426,7 +470,7 @@ const updateClientProfile = async (req, res) => {
 
     const profile = await Profile.findOneAndUpdate(
       { userId: id },
-      { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink, templateId },
+      { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink, templateId, ...(gmail && { gmail }) },
       { new: true, runValidators: true }
     ).populate('userId', 'email role');
 
@@ -437,10 +481,16 @@ const updateClientProfile = async (req, res) => {
       });
     }
 
+    // Add email to the response
+    const profileData = {
+      ...profile.toObject(),
+      email: profile.userId?.email
+    };
+
     res.status(200).json({
       success: true,
       message: 'Profile updated successfully',
-      data: profile
+      data: profileData
     });
   } catch (error) {
     res.status(500).json({
