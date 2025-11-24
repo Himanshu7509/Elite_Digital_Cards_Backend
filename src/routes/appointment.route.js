@@ -1,6 +1,7 @@
 import express from 'express';
 import { 
   createAppointment,
+  createPublicAppointment,
   getMyAppointments,
   getPublicAppointments,
   getAppointmentById,
@@ -22,6 +23,9 @@ router.get('/public/:userId', getPublicAppointments);
 router.get('/:id', authMiddleware, getAppointmentById);
 router.put('/:id', authMiddleware, updateAppointment);
 router.delete('/:id', authMiddleware, deleteAppointment);
+
+// Public routes (no authentication required)
+router.post('/public/:userId', createPublicAppointment);
 
 // Admin routes (protected + admin authorization)
 router.get('/', authMiddleware, adminAuth, getAllAppointments);
