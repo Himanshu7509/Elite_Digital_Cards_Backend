@@ -43,8 +43,7 @@ const createAppointment = async (req, res) => {
                   <table width="600" cellpadding="0" cellspacing="0" style="background-color: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden;">
                     <!-- Header -->
                     <tr>
-                      <td style="padding: 40px 30px; background: linear-gradient(135deg, #7ed321 0%, #c4d900 100%);
- text-align: center;">
+                      <td style="padding: 40px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); text-align: center;">
                         <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">Elite Digital Cards</h1>
                         <p style="color: rgba(255,255,255,0.95); margin: 10px 0 0 0; font-size: 18px;">Digital Business Cards Platform</p>
                       </td>
@@ -230,7 +229,7 @@ const createPublicAppointment = async (req, res) => {
                   <table width="600" cellpadding="0" cellspacing="0" style="background-color: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden;">
                     <!-- Header -->
                     <tr>
-                      <td style="padding: 40px 30px; background: linear-gradient(135deg, #7ed321 0%, #c4d900 100%);
+                      <td style="padding: 40px 30px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 ; text-align: center;">
                         <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">Elite Digital Cards</h1>
                         <p style="color: rgba(255,255,255,0.95); margin: 10px 0 0 0; font-size: 18px;">Digital Business Cards Platform</p>

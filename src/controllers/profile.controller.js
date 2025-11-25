@@ -390,17 +390,48 @@ const deleteMyProfile = async (req, res) => {
 // Admin: Get all client profiles
 const getAllProfiles = async (req, res) => {
   try {
+    // Get all client users
+    const users = await User.find({ role: 'client' });
+    
+    // Get all profiles
     const profiles = await Profile.find().populate('userId', 'email role');
     
-    // Add email to each profile data
-    const profilesData = profiles.map(profile => ({
-      ...profile.toObject(),
-      email: profile.userId?.email
-    }));
+    // Create a map of profiles by userId for quick lookup
+    const profileMap = {};
+    profiles.forEach(profile => {
+      if (profile.userId) {
+        profileMap[profile.userId._id.toString()] = profile;
+      }
+    });
+    
+    // Combine user data with profile data
+    const combinedData = users.map(user => {
+      const profile = profileMap[user._id.toString()];
+      if (profile) {
+        // User has a profile, return profile data with email
+        return {
+          ...profile.toObject(),
+          email: profile.userId?.email,
+          createdAt: user.createdAt,
+          isActive: user.isActive
+        };
+      } else {
+        // User doesn't have a profile, return basic user data
+        return {
+          _id: user._id,
+          userId: user._id,
+          email: user.email,
+          name: '',
+          profession: '',
+          createdAt: user.createdAt,
+          isActive: user.isActive
+        };
+      }
+    });
     
     res.status(200).json({
       success: true,
-      data: profilesData
+      data: combinedData
     });
   } catch (error) {
     res.status(500).json({
