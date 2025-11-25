@@ -11,6 +11,7 @@ A comprehensive backend API for digital business cards with authentication, prof
 - [Testimonials](#testimonials)
 - [Appointments](#appointments)
 - [Password Reset](#password-reset)
+- [Mail](#mail)
 - [Admin Features](#admin-features)
 - [Error Handling](#error-handling)
 
@@ -471,7 +472,108 @@ A comprehensive backend API for digital business cards with authentication, prof
 - **URL**: `DELETE /api/appointments/:id`
 - **Headers**: `Authorization: Bearer <token>`
 
+## Mail
 
+### Send Single Mail
+- **URL**: `POST /api/mail/send-single`
+- **Headers**: `Authorization: Bearer <token>`
+- **Form Data**:
+  - `clientId` (string)
+  - `subject` (string)
+  - `message` (string)
+  - `attachments` (files, optional, up to 5 files)
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Mail sent to client@example.com",
+    "sender": "admin@example.com (admin)",
+    "messageId": "message_id"
+  }
+  ```
+
+### Send Group Mail
+- **URL**: `POST /api/mail/send-group`
+- **Headers**: `Authorization: Bearer <token>`
+- **Form Data**:
+  - `clientIds[]` (array of client IDs)
+  - `subject` (string)
+  - `message` (string)
+  - `attachments` (files, optional, up to 5 files)
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Group mail sent to 5 clients",
+    "emails": ["client1@example.com", "client2@example.com", "..."],
+    "sender": "admin@example.com (admin)",
+    "messageId": "message_id"
+  }
+  ```
+
+### Get Sent Mails
+- **URL**: `GET /api/mail/`
+- **Headers**: `Authorization: Bearer <token>`
+- **Query Parameters**:
+  - `page` (number, optional, default: 1)
+  - `limit` (number, optional, default: 10)
+  - `senderEmail` (string, optional)
+  - `recipientType` (string, optional, "single" or "group")
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "mails": [
+      {
+        "_id": "mail_id",
+        "messageId": "message_id",
+        "senderEmail": "admin@example.com",
+        "senderRole": "admin",
+        "recipients": ["client@example.com"],
+        "recipientType": "single",
+        "subject": "Email Subject",
+        "sentAt": "2023-01-01T00:00:00.000Z",
+        "attachments": [
+          {
+            "filename": "document.pdf",
+            "size": 1024
+          }
+        ],
+        "clientIds": ["client_id"]
+      }
+    ],
+    "totalPages": 1,
+    "currentPage": 1,
+    "totalMails": 1
+  }
+  ```
+
+### Get Sent Mail by ID
+- **URL**: `GET /api/mail/:id`
+- **Headers**: `Authorization: Bearer <token>`
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "mail": {
+      "_id": "mail_id",
+      "messageId": "message_id",
+      "senderEmail": "admin@example.com",
+      "senderRole": "admin",
+      "recipients": ["client@example.com"],
+      "recipientType": "single",
+      "subject": "Email Subject",
+      "sentAt": "2023-01-01T00:00:00.000Z",
+      "attachments": [
+        {
+          "filename": "document.pdf",
+          "size": 1024
+        }
+      ],
+      "clientIds": ["client_id"]
+    }
+  }
+  ```
 
 ## Admin Features
 
@@ -483,6 +585,7 @@ Admin users can access all client data and perform administrative operations:
 - **Testimonials**: `GET /api/testimonials/`, `GET /api/testimonials/:id/admin`, `PUT /api/testimonials/:id/admin`, `DELETE /api/testimonials/:id/admin`
 - **Appointments**: `GET /api/appointments/`, `GET /api/appointments/:id/admin`, `PUT /api/appointments/:id/admin`, `DELETE /api/appointments/:id/admin`
 - **Profiles**: `GET /api/profile/`, `GET /api/profile/:id`, `PUT /api/profile/:id`, `DELETE /api/profile/:id`
+- **Mail**: `POST /api/mail/send-single`, `POST /api/mail/send-group`, `GET /api/mail/`, `GET /api/mail/:id`
 
 ## Error Handling
 

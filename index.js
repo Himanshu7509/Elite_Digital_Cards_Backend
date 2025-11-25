@@ -15,6 +15,7 @@ import productRoutes from './src/routes/product.route.js';
 import testimonialRoutes from './src/routes/testimonial.route.js';
 import appointmentRoutes from './src/routes/appointment.route.js';
 import passwordRoutes from './src/routes/password.route.js';
+import mailRoutes from './src/routes/mail.route.js';
 
 console.log('Routes imported successfully');
 
@@ -46,6 +47,8 @@ app.use('/api/appointments', appointmentRoutes);
 console.log('Appointments routes registered');
 app.use('/api/password', passwordRoutes);
 console.log('Password routes registered');
+app.use('/api/mail', mailRoutes);
+console.log('Mail routes registered');
 
 app.get('/', (req, res) => {
   res.status(200).json({
@@ -68,7 +71,8 @@ app.get('/api/debug/routes', (req, res) => {
       '/api/products',
       '/api/testimonials',
       '/api/appointments',
-      '/api/password'
+      '/api/password',
+      '/api/mail'
     ]
   });
 });
