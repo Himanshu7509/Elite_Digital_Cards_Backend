@@ -8,12 +8,21 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import axios from 'axios';
+// Import the configured resend instance
+import resend from "../config/email.js";
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Get the sender email from environment variables
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "noreply@elitedigitalcards.com";
+const FROM_NAME = "Elite Digital Cards";
+
+// Log environment variables for debugging (remove in production)
+console.log("RESEND_API_KEY present:", !!process.env.RESEND_API_KEY);
+console.log("FROM_EMAIL:", FROM_EMAIL);
+console.log("Resend instance created:", !!resend);
 
 // Helper function to extract message ID from Resend response
 const extractMessageId = (response) => {
@@ -53,7 +62,7 @@ export const sendSingleMail = async (req, res) => {
     const { clientId, subject, message } = req.body;
     // Get sender information from authenticated user
     const sender = req.user ? `${req.user.email} (${req.user.role})` : "Elite Digital Cards";
-    const senderEmail = req.user ? req.user.email : "noreply@elitedigitalcards.com";
+    const senderEmail = req.user ? req.user.email : FROM_EMAIL;
     const senderRole = req.user ? req.user.role : "system";
 
     const client = await User.findById(clientId);
@@ -80,7 +89,7 @@ export const sendSingleMail = async (req, res) => {
 
     // Send email with enhanced business template
     const emailResponse = await resend.emails.send({
-      from: "Elite Digital Cards <noreply@elitedigitalcards.com>",
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
       to: client.email,
       subject,
       html: `<!DOCTYPE html>
@@ -197,7 +206,7 @@ export const sendGroupMail = async (req, res) => {
     
     // Get sender information from authenticated user
     const sender = req.user ? `${req.user.email} (${req.user.role})` : "Elite Digital Cards";
-    const senderEmail = req.user ? req.user.email : "noreply@elitedigitalcards.com";
+    const senderEmail = req.user ? req.user.email : FROM_EMAIL;
     const senderRole = req.user ? req.user.role : "system";
 
     // Fetch all clients
@@ -265,8 +274,8 @@ export const sendGroupMail = async (req, res) => {
 
     // Send email with enhanced business template using BCC for privacy
     const emailResponse = await resend.emails.send({
-      from: "Elite Digital Cards <noreply@elitedigitalcards.com>",
-      to: ["me@elitedigitalcards.com"], // Primary recipient (sender)
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      to: [FROM_EMAIL], // Primary recipient (sender)
       bcc: emails, // Blind carbon copy to all clients (hides email addresses from each other)
       subject,
       html: `<!DOCTYPE html>
