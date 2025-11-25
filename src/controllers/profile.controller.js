@@ -549,32 +549,30 @@ const deleteClientProfile = async (req, res) => {
     // Find profile before deleting
     const profile = await Profile.findOne({ userId: id });
 
-    if (!profile) {
-      return res.status(404).json({
-        success: false,
-        message: 'Profile not found'
-      });
-    }
-
     // Delete images from S3 if they exist
-    if (profile.profileImg) {
+    if (profile && profile.profileImg) {
       await deleteImageFromS3(profile.profileImg);
     }
-    if (profile.bannerImg) {
+    if (profile && profile.bannerImg) {
       await deleteImageFromS3(profile.bannerImg);
     }
 
-    // Delete profile from database
-    await Profile.findOneAndDelete({ userId: id });
+    // Delete profile from database (if it exists)
+    if (profile) {
+      await Profile.findOneAndDelete({ userId: id });
+    }
+
+    // Delete the user account itself
+    await User.findByIdAndDelete(id);
 
     res.status(200).json({
       success: true,
-      message: 'Profile deleted successfully'
+      message: 'Client account and all associated data deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting profile',
+      message: 'Error deleting client',
       error: error.message
     });
   }
