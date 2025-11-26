@@ -1,5 +1,8 @@
 import Profile from '../models/profile.model.js';
 import User from '../models/auth.model.js';
+import Service from '../models/service.model.js';
+import Product from '../models/product.model.js';
+import Testimonial from '../models/testimonial.model.js';
 import s3 from '../config/s3.js';
 import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';
@@ -661,5 +664,6 @@ export {
   getClientProfile,
   updateClientProfile,
   deleteClientProfile,
-  getDashboardStats
+  getDashboardStats,
+  upload
 };
