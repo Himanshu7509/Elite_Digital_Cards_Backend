@@ -25,6 +25,7 @@ router.put('/:id', authMiddleware, updateGalleryItem);
 router.delete('/:id', authMiddleware, deleteGalleryItem);
 
 // Admin routes (protected + admin authorization)
+router.post('/admin/upload', authMiddleware, adminAuth, upload.single('image'), uploadGalleryImage);
 router.get('/', authMiddleware, adminAuth, getAllGalleryItems);
 router.get('/:id/admin', authMiddleware, adminAuth, getAdminGalleryItemById);
 router.put('/:id/admin', authMiddleware, adminAuth, updateAdminGalleryItem);

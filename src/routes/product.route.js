@@ -25,6 +25,7 @@ router.put('/:id', authMiddleware, upload.single('productPhoto'), updateProduct)
 router.delete('/:id', authMiddleware, deleteProduct);
 
 // Admin routes (protected + admin authorization)
+router.post('/admin/upload', authMiddleware, adminAuth, upload.single('productPhoto'), createProduct);
 router.get('/', authMiddleware, adminAuth, getAllProducts);
 router.get('/:id/admin', authMiddleware, adminAuth, getAdminProductById);
 router.put('/:id/admin', authMiddleware, adminAuth, upload.single('productPhoto'), updateAdminProduct);

@@ -56,10 +56,13 @@ const createProduct = async (req, res) => {
     // Upload image to S3
     const imageUrl = await uploadToS3(req.file);
 
-    const { productName, price, details } = req.body;
+    const { productName, price, details, userId } = req.body;
+
+    // Use the provided userId if it exists (admin creating for client), otherwise use the authenticated user's ID
+    const productUserId = userId || req.user.id;
 
     const product = new Product({
-      userId: req.user.id,
+      userId: productUserId,
       productName,
       productPhoto: imageUrl,
       price,

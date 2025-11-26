@@ -24,6 +24,7 @@ router.put('/:id', authMiddleware, updateService);
 router.delete('/:id', authMiddleware, deleteService);
 
 // Admin routes (protected + admin authorization)
+router.post('/admin', authMiddleware, adminAuth, createService); // Add this line
 router.get('/', authMiddleware, adminAuth, getAllServices);
 router.get('/:id/admin', authMiddleware, adminAuth, getAdminServiceById);
 router.put('/:id/admin', authMiddleware, adminAuth, updateAdminService);

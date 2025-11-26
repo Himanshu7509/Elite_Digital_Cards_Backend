@@ -499,18 +499,38 @@ const updateClientProfile = async (req, res) => {
       });
     }
 
-    const profile = await Profile.findOneAndUpdate(
-      { userId: id },
-      { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink, templateId, ...(gmail && { gmail }) },
-      { new: true, runValidators: true }
-    ).populate('userId', 'email role');
-
+    // Check if profile exists, if not create it
+    let profile = await Profile.findOne({ userId: id });
+    
     if (!profile) {
-      return res.status(404).json({
-        success: false,
-        message: 'Profile not found'
+      // Create new profile if it doesn't exist
+      profile = new Profile({
+        userId: id,
+        name: name || '',
+        profession: profession || '',
+        about: about || '',
+        phone1: phone1 || '',
+        phone2: phone2 || '',
+        location: location || '',
+        dob: dob || null,
+        socialMedia: socialMedia || {},
+        websiteLink: websiteLink || '',
+        appLink: appLink || '',
+        templateId: templateId || 'template1',
+        ...(gmail && { gmail })
       });
+      await profile.save();
+    } else {
+      // Update existing profile
+      profile = await Profile.findOneAndUpdate(
+        { userId: id },
+        { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink, templateId, ...(gmail && { gmail }) },
+        { new: true, runValidators: true }
+      );
     }
+
+    // Populate user data
+    await profile.populate('userId', 'email role');
 
     // Add email to the response
     const profileData = {

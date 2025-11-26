@@ -7,10 +7,13 @@ dotenv.config();
 // Create testimonial
 const createTestimonial = async (req, res) => {
   try {
-    const { testimonialName, feedback } = req.body;
+    const { testimonialName, feedback, userId } = req.body;
+
+    // Use the provided userId if it exists (admin creating for client), otherwise use the authenticated user's ID
+    const testimonialUserId = userId || req.user.id;
 
     const testimonial = new Testimonial({
-      userId: req.user.id,
+      userId: testimonialUserId,
       testimonialName,
       feedback
     });

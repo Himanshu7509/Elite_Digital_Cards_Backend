@@ -53,14 +53,17 @@ const uploadGalleryImage = async (req, res) => {
       });
     }
 
-    const { caption } = req.body;
+    const { caption, userId } = req.body;
 
     // Upload image to S3
     const imageUrl = await uploadToS3(req.file);
 
+    // Use the provided userId if it exists (admin creating for client), otherwise use the authenticated user's ID
+    const galleryUserId = userId || req.user.id;
+
     // Create gallery entry
     const galleryItem = new Gallery({
-      userId: req.user.id,
+      userId: galleryUserId,
       imageUrl: imageUrl,
       caption
     });

@@ -24,6 +24,7 @@ router.put('/:id', authMiddleware, updateTestimonial);
 router.delete('/:id', authMiddleware, deleteTestimonial);
 
 // Admin routes (protected + admin authorization)
+router.post('/admin', authMiddleware, adminAuth, createTestimonial);
 router.get('/', authMiddleware, adminAuth, getAllTestimonials);
 router.get('/:id/admin', authMiddleware, adminAuth, getAdminTestimonialById);
 router.put('/:id/admin', authMiddleware, adminAuth, updateAdminTestimonial);

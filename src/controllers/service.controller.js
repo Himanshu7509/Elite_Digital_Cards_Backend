@@ -7,10 +7,13 @@ dotenv.config();
 // Create service
 const createService = async (req, res) => {
   try {
-    const { title, description } = req.body;
+    const { title, description, userId } = req.body;
+
+    // Use the provided userId if it exists (admin creating for client), otherwise use the authenticated user's ID
+    const serviceUserId = userId || req.user.id;
 
     const service = new Service({
-      userId: req.user.id,
+      userId: serviceUserId,
       title,
       description
     });
