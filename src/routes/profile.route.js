@@ -11,6 +11,7 @@ import {
   getClientProfile,
   updateClientProfile,
   deleteClientProfile,
+  getDashboardStats,
   upload
 } from '../controllers/profile.controller.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.middleware.js';
@@ -32,6 +33,7 @@ router.get('/public/:userId', getPublicProfile);
 
 // Admin routes (protected + admin authorization)
 router.get('/', authMiddleware, adminAuth, getAllProfiles);
+router.get('/dashboard-stats', authMiddleware, adminAuth, getDashboardStats);
 router.get('/:id', authMiddleware, adminAuth, getClientProfile);
 router.put('/:id', authMiddleware, adminAuth, updateClientProfile);
 router.delete('/:id', authMiddleware, adminAuth, deleteClientProfile);

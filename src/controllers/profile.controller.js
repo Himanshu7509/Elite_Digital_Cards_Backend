@@ -598,6 +598,57 @@ const deleteClientProfile = async (req, res) => {
   }
 };
 
+// Admin: Get dashboard statistics
+const getDashboardStats = async (req, res) => {
+  try {
+    // Get total clients
+    const totalClients = await User.countDocuments({ role: 'client' });
+    
+    // Get clients with profiles (profile completion)
+    const clientsWithProfiles = await Profile.countDocuments();
+    
+    // Get total services
+    const totalServices = await Service.countDocuments();
+    
+    // Get total products
+    const totalProducts = await Product.countDocuments();
+    
+    // Get total testimonials
+    const totalTestimonials = await Testimonial.countDocuments();
+    
+    // Get recent clients (last 5)
+    const recentClients = await User.find({ role: 'client' })
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .select('email createdAt');
+    
+    // Get recent profiles (last 5)
+    const recentProfiles = await Profile.find()
+      .sort({ createdAt: -1 })
+      .limit(5)
+      .populate('userId', 'email');
+    
+    res.status(200).json({
+      success: true,
+      data: {
+        totalClients,
+        clientsWithProfiles,
+        totalServices,
+        totalProducts,
+        totalTestimonials,
+        recentClients,
+        recentProfiles
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching dashboard statistics',
+      error: error.message
+    });
+  }
+};
+
 export {
   createProfile,
   uploadProfileImage,
@@ -610,5 +661,5 @@ export {
   getClientProfile,
   updateClientProfile,
   deleteClientProfile,
-  upload
+  getDashboardStats
 };
