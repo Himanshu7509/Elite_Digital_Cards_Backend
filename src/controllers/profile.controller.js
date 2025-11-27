@@ -652,6 +652,94 @@ const getDashboardStats = async (req, res) => {
   }
 };
 
+// Get user registration statistics for charts
+const getUserRegistrationStats = async (req, res) => {
+  try {
+    // Calculate date ranges
+    const now = new Date();
+    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    
+    // Get weekly user registrations grouped by day
+    const weeklyStats = {};
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    
+    // Initialize weekly stats with zero counts
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(now);
+      date.setDate(date.getDate() - i);
+      const dateString = date.toISOString().split('T')[0];
+      const dayName = dayNames[date.getDay()];
+      weeklyStats[dateString] = {
+        count: 0,
+        day: dayName
+      };
+    }
+    
+    // Get users registered in the last week
+    const weeklyUsers = await User.find({
+      role: 'client',
+      createdAt: {
+        $gte: oneWeekAgo,
+        $lte: now
+      }
+    });
+    
+    // Count users by registration day
+    weeklyUsers.forEach(user => {
+      const date = user.createdAt.toISOString().split('T')[0];
+      if (weeklyStats[date] !== undefined) {
+        weeklyStats[date].count++;
+      }
+    });
+    
+    // Format weekly stats
+    const formattedWeeklyStats = Object.keys(weeklyStats).map(date => ({
+      date,
+      day: weeklyStats[date].day,
+      count: weeklyStats[date].count
+    }));
+    
+    // Get monthly user registrations grouped by week
+    const monthlyStats = [];
+    for (let i = 3; i >= 0; i--) {
+      const weekEnd = new Date(now);
+      weekEnd.setDate(weekEnd.getDate() - i * 7);
+      const weekStart = new Date(weekEnd);
+      weekStart.setDate(weekStart.getDate() - 6);
+      
+      // Count users in this week
+      const count = await User.countDocuments({
+        role: 'client',
+        createdAt: {
+          $gte: weekStart,
+          $lte: weekEnd
+        }
+      });
+      
+      monthlyStats.push({
+        weekStart: weekStart.toISOString().split('T')[0],
+        weekEnd: weekEnd.toISOString().split('T')[0],
+        count
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      data: {
+        weeklyStats: formattedWeeklyStats,
+        monthlyStats
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching user registration statistics',
+      error: error.message
+    });
+  }
+};
+
 export {
   createProfile,
   uploadProfileImage,
@@ -665,5 +753,6 @@ export {
   updateClientProfile,
   deleteClientProfile,
   getDashboardStats,
+  getUserRegistrationStats,
   upload
 };
