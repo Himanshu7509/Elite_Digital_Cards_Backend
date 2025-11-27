@@ -1,12 +1,9 @@
 import express from 'express';
-import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 import cors from 'cors';
+import dotenv from 'dotenv';
 
-// Load environment variables first
-dotenv.config();
-console.log('Environment variables loaded');
-
-// Import routes after environment variables are loaded
+// Import routes
 import authRoutes from './src/routes/auth.route.js';
 import profileRoutes from './src/routes/profile.route.js';
 import serviceRoutes from './src/routes/service.route.js';
@@ -16,19 +13,23 @@ import testimonialRoutes from './src/routes/testimonial.route.js';
 import appointmentRoutes from './src/routes/appointment.route.js';
 import passwordRoutes from './src/routes/password.route.js';
 import mailRoutes from './src/routes/mail.route.js';
+import inquiryRoutes from './src/routes/inquiry.route.js';
 
-console.log('Routes imported successfully');
+// Load environment variables
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Database connection
-import dbConnect from './src/config/mongodb.js';
-dbConnect();
-
+// Middleware
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((error) => console.error('MongoDB connection error:', error));
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -49,6 +50,8 @@ app.use('/api/password', passwordRoutes);
 console.log('Password routes registered');
 app.use('/api/mail', mailRoutes);
 console.log('Mail routes registered');
+app.use('/api/inquiries', inquiryRoutes);
+console.log('Inquiry routes registered');
 
 app.get('/', (req, res) => {
   res.status(200).json({
@@ -72,7 +75,8 @@ app.get('/api/debug/routes', (req, res) => {
       '/api/testimonials',
       '/api/appointments',
       '/api/password',
-      '/api/mail'
+      '/api/mail',
+      '/api/inquiries'
     ]
   });
 });
@@ -86,7 +90,6 @@ app.use((err, req, res, next) => {
     error: err.message || {}
   });
 });
-
 
 // 404 handler - This should be the last middleware
 app.use((req, res) => {
