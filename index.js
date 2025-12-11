@@ -15,6 +15,12 @@ import appointmentRoutes from './src/routes/appointment.route.js';
 import passwordRoutes from './src/routes/password.route.js';
 import mailRoutes from './src/routes/mail.route.js';
 import inquiryRoutes from './src/routes/inquiry.route.js';
+// Import new student section routes
+import studentSkillRoutes from './src/routes/studentSkill.route.js';
+import studentExperienceRoutes from './src/routes/studentExperience.route.js';
+import studentProjectRoutes from './src/routes/studentProject.route.js';
+import studentEducationRoutes from './src/routes/studentEducation.route.js';
+import studentAwardRoutes from './src/routes/studentAward.route.js';
 
 // Load environment variables
 dotenv.config();
@@ -38,6 +44,16 @@ app.use('/api/profile', profileRoutes);
 console.log('Profile routes registered');
 app.use('/api/student-profile', studentProfileRoutes);
 console.log('Student Profile routes registered');
+app.use('/api/student-skills', studentSkillRoutes);
+console.log('Student Skills routes registered');
+app.use('/api/student-experiences', studentExperienceRoutes);
+console.log('Student Experiences routes registered');
+app.use('/api/student-projects', studentProjectRoutes);
+console.log('Student Projects routes registered');
+app.use('/api/student-educations', studentEducationRoutes);
+console.log('Student Educations routes registered');
+app.use('/api/student-awards', studentAwardRoutes);
+console.log('Student Awards routes registered');
 app.use('/api/services', serviceRoutes);
 console.log('Services routes registered');
 app.use('/api/gallery', galleryRoutes);
@@ -72,6 +88,11 @@ app.get('/api/debug/routes', (req, res) => {
       '/api/auth',
       '/api/profile',
       '/api/student-profile',
+      '/api/student-skills',
+      '/api/student-experiences',
+      '/api/student-projects',
+      '/api/student-educations',
+      '/api/student-awards',
       '/api/services',
       '/api/gallery',
       '/api/products',

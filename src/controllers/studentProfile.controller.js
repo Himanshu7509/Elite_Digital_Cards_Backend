@@ -4,6 +4,12 @@ import s3 from '../config/s3.js';
 import { v4 as uuidv4 } from 'uuid';
 import multer from 'multer';
 import dotenv from 'dotenv';
+// Import new models
+import StudentSkill from '../models/studentSkill.model.js';
+import StudentExperience from '../models/studentExperience.model.js';
+import StudentProject from '../models/studentProject.model.js';
+import StudentEducation from '../models/studentEducation.model.js';
+import StudentAward from '../models/studentAward.model.js';
 
 dotenv.config();
 
@@ -278,7 +284,14 @@ const getPublicStudentProfile = async (req, res) => {
       });
     }
 
-    // Return only non-sensitive profile data
+    // Get related data
+    const skills = await StudentSkill.find({ userId }).select('-userId -__v -createdAt -updatedAt');
+    const experiences = await StudentExperience.find({ userId }).select('-userId -__v -createdAt -updatedAt');
+    const projects = await StudentProject.find({ userId }).select('-userId -__v -createdAt -updatedAt');
+    const educations = await StudentEducation.find({ userId }).select('-userId -__v -createdAt -updatedAt');
+    const awards = await StudentAward.find({ userId }).select('-userId -__v -createdAt -updatedAt');
+
+    // Return profile data with all related sections
     const publicProfile = {
       fullName: profile.fullName,
       email: profile.email,
@@ -291,6 +304,11 @@ const getPublicStudentProfile = async (req, res) => {
       templateId: profile.templateId,
       profilePic: profile.profilePic,
       bannerPic: profile.bannerPic,
+      skills: skills,
+      experiences: experiences,
+      projects: projects,
+      educations: educations,
+      awards: awards,
       createdAt: profile.createdAt,
       updatedAt: profile.updatedAt
     };
@@ -536,7 +554,7 @@ const updateStudentProfile = async (req, res) => {
         location: location || '',
         dob: dob || null,
         socialMedia: socialMedia || {},
-        templateId: templateId || 'template1'
+        templateId: templateId || 'template111'
       });
       await profile.save();
     } else {
