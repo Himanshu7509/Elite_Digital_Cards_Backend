@@ -54,6 +54,14 @@ const deleteImageFromS3 = async (imageUrl) => {
 // Create client profile
 const createProfile = async (req, res) => {
   try {
+    // Check if user has client role
+    if (req.user.role !== 'client') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only clients can create client profiles'
+      });
+    }
+
     const { name, profession, about, phone1, phone2, location, dob, socialMedia, profileImg, bannerImg, gmail } = req.body;
 
     // Check if profile already exists for this user
@@ -109,6 +117,14 @@ const createProfile = async (req, res) => {
 // Upload or update profile image
 const uploadProfileImage = async (req, res) => {
   try {
+    // Check if user has client role
+    if (req.user.role !== 'client') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only clients can upload profile images'
+      });
+    }
+
     console.log('Upload profile image request received');
     console.log('Request file:', req.file);
     console.log('Request body:', req.body);
@@ -174,6 +190,14 @@ const uploadProfileImage = async (req, res) => {
 // Upload or update banner image
 const uploadBannerImage = async (req, res) => {
   try {
+    // Check if user has client role
+    if (req.user.role !== 'client') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only clients can upload banner images'
+      });
+    }
+
     console.log('Upload banner image request received');
     console.log('Request file:', req.file);
     console.log('Request body:', req.body);
@@ -239,6 +263,14 @@ const uploadBannerImage = async (req, res) => {
 // Get client's own profile
 const getMyProfile = async (req, res) => {
   try {
+    // Check if user has client role
+    if (req.user.role !== 'client') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only clients can access client profiles'
+      });
+    }
+
     const profile = await Profile.findOne({ userId: req.user.id }).populate('userId', 'email');
     
     if (!profile) {
@@ -282,6 +314,14 @@ const getPublicProfile = async (req, res) => {
       });
     }
 
+    // Check if user has client role
+    if (profile.userId?.role !== 'client') {
+      return res.status(403).json({
+        success: false,
+        message: 'Profile not found'
+      });
+    }
+
     // Return only non-sensitive profile data
     const publicProfile = {
       name: profile.name,
@@ -319,6 +359,14 @@ const getPublicProfile = async (req, res) => {
 // Update client's own profile
 const updateMyProfile = async (req, res) => {
   try {
+    // Check if user has client role
+    if (req.user.role !== 'client') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only clients can update client profiles'
+      });
+    }
+
     const { name, profession, about, phone1, phone2, location, dob, socialMedia, websiteLink, appLink, templateId, gmail } = req.body;
 
     const profile = await Profile.findOneAndUpdate(
@@ -357,6 +405,14 @@ const updateMyProfile = async (req, res) => {
 // Delete client's own profile
 const deleteMyProfile = async (req, res) => {
   try {
+    // Check if user has client role
+    if (req.user.role !== 'client') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only clients can delete client profiles'
+      });
+    }
+
     const profile = await Profile.findOne({ userId: req.user.id });
 
     if (!profile) {
@@ -393,6 +449,14 @@ const deleteMyProfile = async (req, res) => {
 // Admin: Get all client profiles
 const getAllProfiles = async (req, res) => {
   try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can access all client profiles'
+      });
+    }
+
     // Get all client users
     const users = await User.find({ role: 'client' });
     

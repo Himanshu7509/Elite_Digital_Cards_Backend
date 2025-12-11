@@ -7,10 +7,18 @@ const generateToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
-// Client Signup
+// Signup for client or student
 const signup = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, role } = req.body;
+
+    // Validate role if provided
+    if (role && !['client', 'student'].includes(role)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid role. Must be either client or student'
+      });
+    }
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -21,11 +29,11 @@ const signup = async (req, res) => {
       });
     }
 
-    // Create new user with client role
+    // Create new user with specified role or default to client
     const user = new User({
       email,
       password,
-      role: 'client'
+      role: role || 'client'
     });
 
     await user.save();

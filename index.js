@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 // Import routes
 import authRoutes from './src/routes/auth.route.js';
 import profileRoutes from './src/routes/profile.route.js';
+import studentProfileRoutes from './src/routes/studentProfile.route.js';
 import serviceRoutes from './src/routes/service.route.js';
 import galleryRoutes from './src/routes/gallery.route.js';
 import productRoutes from './src/routes/product.route.js';
@@ -35,6 +36,8 @@ app.use('/api/auth', authRoutes);
 console.log('Auth routes registered');
 app.use('/api/profile', profileRoutes);
 console.log('Profile routes registered');
+app.use('/api/student-profile', studentProfileRoutes);
+console.log('Student Profile routes registered');
 app.use('/api/services', serviceRoutes);
 console.log('Services routes registered');
 app.use('/api/gallery', galleryRoutes);
@@ -68,6 +71,7 @@ app.get('/api/debug/routes', (req, res) => {
     routes: [
       '/api/auth',
       '/api/profile',
+      '/api/student-profile',
       '/api/services',
       '/api/gallery',
       '/api/products',
