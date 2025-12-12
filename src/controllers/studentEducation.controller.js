@@ -1,9 +1,10 @@
 import StudentEducation from '../models/studentEducation.model.js';
-import User from '../models/auth.model.js';
 
-// Create a new student education
+// Create student education
 const createStudentEducation = async (req, res) => {
   try {
+    const { degree, major, school, year, gpa } = req.body;
+
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
@@ -12,48 +13,44 @@ const createStudentEducation = async (req, res) => {
       });
     }
 
-    const { degree, major, institution, startDate, endDate, gpa, description } = req.body;
-
     const education = new StudentEducation({
       userId: req.user.id,
       degree,
       major,
-      institution,
-      startDate,
-      endDate,
-      gpa,
-      description
+      school,
+      year,
+      gpa
     });
 
     await education.save();
 
     res.status(201).json({
       success: true,
-      message: 'Student education record created successfully',
+      message: 'Education record created successfully',
       data: education
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error creating student education record',
+      message: 'Error creating education record',
       error: error.message
     });
   }
 };
 
-// Get all education records for the logged-in student
+// Get all education records for the student
 const getMyStudentEducations = async (req, res) => {
   try {
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can access their education records'
+        message: 'Only students can access education records'
       });
     }
 
-    const educations = await StudentEducation.find({ userId: req.user.id }).sort({ startDate: -1 });
-
+    const educations = await StudentEducation.find({ userId: req.user.id });
+    
     res.status(200).json({
       success: true,
       data: educations
@@ -61,141 +58,136 @@ const getMyStudentEducations = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching student education records',
+      message: 'Error fetching education records',
       error: error.message
     });
   }
 };
 
-// Get public education records for a student (read-only access for anyone)
-const getPublicStudentEducations = async (req, res) => {
+// Get education record by ID
+const getStudentEducationById = async (req, res) => {
   try {
-    const { userId } = req.params;
+    // Check if user has student role
+    if (req.user.role !== 'student') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only students can access education records'
+      });
+    }
 
-    // Check if user exists and is a student
-    const user = await User.findById(userId);
-    if (!user || user.role !== 'student') {
+    const { id } = req.params;
+    
+    const education = await StudentEducation.findOne({ _id: id, userId: req.user.id });
+    
+    if (!education) {
       return res.status(404).json({
         success: false,
-        message: 'Student not found'
+        message: 'Education record not found'
       });
     }
 
-    const educations = await StudentEducation.find({ userId }).sort({ startDate: -1 });
-
     res.status(200).json({
       success: true,
-      data: educations
+      data: education
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching student education records',
+      message: 'Error fetching education record',
       error: error.message
     });
   }
 };
 
-// Update a student education record
+// Update student education record
 const updateStudentEducation = async (req, res) => {
   try {
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can update their education records'
+        message: 'Only students can update education records'
       });
     }
 
     const { id } = req.params;
-    const { degree, major, institution, startDate, endDate, gpa, description } = req.body;
+    const { degree, major, school, year, gpa } = req.body;
 
     const education = await StudentEducation.findOneAndUpdate(
       { _id: id, userId: req.user.id },
-      { degree, major, institution, startDate, endDate, gpa, description },
+      { degree, major, school, year, gpa },
       { new: true, runValidators: true }
     );
 
     if (!education) {
       return res.status(404).json({
         success: false,
-        message: 'Student education record not found'
+        message: 'Education record not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Student education record updated successfully',
+      message: 'Education record updated successfully',
       data: education
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error updating student education record',
+      message: 'Error updating education record',
       error: error.message
     });
   }
 };
 
-// Delete a student education record
+// Delete student education record
 const deleteStudentEducation = async (req, res) => {
   try {
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can delete their education records'
+        message: 'Only students can delete education records'
       });
     }
 
     const { id } = req.params;
-
+    
     const education = await StudentEducation.findOneAndDelete({ _id: id, userId: req.user.id });
 
     if (!education) {
       return res.status(404).json({
         success: false,
-        message: 'Student education record not found'
+        message: 'Education record not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Student education record deleted successfully'
+      message: 'Education record deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting student education record',
+      message: 'Error deleting education record',
       error: error.message
     });
   }
 };
 
-// Admin: Get all education records for a specific student
-const getStudentEducations = async (req, res) => {
+// Admin: Get all student education records
+const getAllStudentEducations = async (req, res) => {
   try {
     // Check if user is admin
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can access student education records'
+        message: 'Only admins can access all education records'
       });
     }
 
-    const { userId } = req.params;
-
-    // Check if user exists and is a student
-    const user = await User.findById(userId);
-    if (!user || user.role !== 'student') {
-      return res.status(404).json({
-        success: false,
-        message: 'Student not found'
-      });
-    }
-
-    const educations = await StudentEducation.find({ userId }).sort({ startDate: -1 });
-
+    const educations = await StudentEducation.find().populate('userId', 'email role');
+    
     res.status(200).json({
       success: true,
       data: educations
@@ -203,44 +195,118 @@ const getStudentEducations = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching student education records',
+      message: 'Error fetching education records',
       error: error.message
     });
   }
 };
 
-// Admin: Delete all education records for a specific student
-const deleteAllStudentEducations = async (req, res) => {
+// Admin: Get specific student education record
+const getAdminStudentEducationById = async (req, res) => {
   try {
     // Check if user is admin
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can delete student education records'
+        message: 'Only admins can access education records'
       });
     }
 
-    const { userId } = req.params;
-
-    // Check if user exists and is a student
-    const user = await User.findById(userId);
-    if (!user || user.role !== 'student') {
+    const { id } = req.params;
+    
+    const education = await StudentEducation.findById(id).populate('userId', 'email role');
+    
+    if (!education) {
       return res.status(404).json({
         success: false,
-        message: 'Student not found'
+        message: 'Education record not found'
       });
     }
-
-    await StudentEducation.deleteMany({ userId });
 
     res.status(200).json({
       success: true,
-      message: 'All student education records deleted successfully'
+      data: education
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting student education records',
+      message: 'Error fetching education record',
+      error: error.message
+    });
+  }
+};
+
+// Admin: Update student education record
+const updateAdminStudentEducation = async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can update education records'
+      });
+    }
+
+    const { id } = req.params;
+    const { degree, major, school, year, gpa } = req.body;
+
+    const education = await StudentEducation.findByIdAndUpdate(
+      id,
+      { degree, major, school, year, gpa },
+      { new: true, runValidators: true }
+    );
+
+    if (!education) {
+      return res.status(404).json({
+        success: false,
+        message: 'Education record not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Education record updated successfully',
+      data: education
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error updating education record',
+      error: error.message
+    });
+  }
+};
+
+// Admin: Delete student education record
+const deleteAdminStudentEducation = async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can delete education records'
+      });
+    }
+
+    const { id } = req.params;
+    
+    const education = await StudentEducation.findByIdAndDelete(id);
+
+    if (!education) {
+      return res.status(404).json({
+        success: false,
+        message: 'Education record not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Education record deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting education record',
       error: error.message
     });
   }
@@ -249,9 +315,11 @@ const deleteAllStudentEducations = async (req, res) => {
 export {
   createStudentEducation,
   getMyStudentEducations,
-  getPublicStudentEducations,
+  getStudentEducationById,
   updateStudentEducation,
   deleteStudentEducation,
-  getStudentEducations,
-  deleteAllStudentEducations
+  getAllStudentEducations,
+  getAdminStudentEducationById,
+  updateAdminStudentEducation,
+  deleteAdminStudentEducation
 };

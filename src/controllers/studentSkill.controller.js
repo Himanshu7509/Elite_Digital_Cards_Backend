@@ -1,9 +1,10 @@
 import StudentSkill from '../models/studentSkill.model.js';
-import User from '../models/auth.model.js';
 
-// Create a new student skill
+// Create student skill
 const createStudentSkill = async (req, res) => {
   try {
+    const { name, level } = req.body;
+
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
@@ -11,8 +12,6 @@ const createStudentSkill = async (req, res) => {
         message: 'Only students can create skills'
       });
     }
-
-    const { name, level } = req.body;
 
     const skill = new StudentSkill({
       userId: req.user.id,
@@ -24,31 +23,31 @@ const createStudentSkill = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Student skill created successfully',
+      message: 'Skill created successfully',
       data: skill
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error creating student skill',
+      message: 'Error creating skill',
       error: error.message
     });
   }
 };
 
-// Get all skills for the logged-in student
+// Get all skills for the student
 const getMyStudentSkills = async (req, res) => {
   try {
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can access their skills'
+        message: 'Only students can access skills'
       });
     }
 
-    const skills = await StudentSkill.find({ userId: req.user.id }).sort({ createdAt: -1 });
-
+    const skills = await StudentSkill.find({ userId: req.user.id });
+    
     res.status(200).json({
       success: true,
       data: skills
@@ -56,49 +55,55 @@ const getMyStudentSkills = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching student skills',
+      message: 'Error fetching skills',
       error: error.message
     });
   }
 };
 
-// Get public skills for a student (read-only access for anyone)
-const getPublicStudentSkills = async (req, res) => {
+// Get skill by ID
+const getStudentSkillById = async (req, res) => {
   try {
-    const { userId } = req.params;
+    // Check if user has student role
+    if (req.user.role !== 'student') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only students can access skills'
+      });
+    }
 
-    // Check if user exists and is a student
-    const user = await User.findById(userId);
-    if (!user || user.role !== 'student') {
+    const { id } = req.params;
+    
+    const skill = await StudentSkill.findOne({ _id: id, userId: req.user.id });
+    
+    if (!skill) {
       return res.status(404).json({
         success: false,
-        message: 'Student not found'
+        message: 'Skill not found'
       });
     }
 
-    const skills = await StudentSkill.find({ userId }).sort({ createdAt: -1 });
-
     res.status(200).json({
       success: true,
-      data: skills
+      data: skill
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching student skills',
+      message: 'Error fetching skill',
       error: error.message
     });
   }
 };
 
-// Update a student skill
+// Update student skill
 const updateStudentSkill = async (req, res) => {
   try {
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can update their skills'
+        message: 'Only students can update skills'
       });
     }
 
@@ -114,83 +119,72 @@ const updateStudentSkill = async (req, res) => {
     if (!skill) {
       return res.status(404).json({
         success: false,
-        message: 'Student skill not found'
+        message: 'Skill not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Student skill updated successfully',
+      message: 'Skill updated successfully',
       data: skill
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error updating student skill',
+      message: 'Error updating skill',
       error: error.message
     });
   }
 };
 
-// Delete a student skill
+// Delete student skill
 const deleteStudentSkill = async (req, res) => {
   try {
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can delete their skills'
+        message: 'Only students can delete skills'
       });
     }
 
     const { id } = req.params;
-
+    
     const skill = await StudentSkill.findOneAndDelete({ _id: id, userId: req.user.id });
 
     if (!skill) {
       return res.status(404).json({
         success: false,
-        message: 'Student skill not found'
+        message: 'Skill not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Student skill deleted successfully'
+      message: 'Skill deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting student skill',
+      message: 'Error deleting skill',
       error: error.message
     });
   }
 };
 
-// Admin: Get all skills for a specific student
-const getStudentSkills = async (req, res) => {
+// Admin: Get all student skills
+const getAllStudentSkills = async (req, res) => {
   try {
     // Check if user is admin
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can access student skills'
+        message: 'Only admins can access all skills'
       });
     }
 
-    const { userId } = req.params;
-
-    // Check if user exists and is a student
-    const user = await User.findById(userId);
-    if (!user || user.role !== 'student') {
-      return res.status(404).json({
-        success: false,
-        message: 'Student not found'
-      });
-    }
-
-    const skills = await StudentSkill.find({ userId }).sort({ createdAt: -1 });
-
+    const skills = await StudentSkill.find().populate('userId', 'email role');
+    
     res.status(200).json({
       success: true,
       data: skills
@@ -198,44 +192,118 @@ const getStudentSkills = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching student skills',
+      message: 'Error fetching skills',
       error: error.message
     });
   }
 };
 
-// Admin: Delete all skills for a specific student
-const deleteAllStudentSkills = async (req, res) => {
+// Admin: Get specific student skill
+const getAdminStudentSkillById = async (req, res) => {
   try {
     // Check if user is admin
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can delete student skills'
+        message: 'Only admins can access skills'
       });
     }
 
-    const { userId } = req.params;
-
-    // Check if user exists and is a student
-    const user = await User.findById(userId);
-    if (!user || user.role !== 'student') {
+    const { id } = req.params;
+    
+    const skill = await StudentSkill.findById(id).populate('userId', 'email role');
+    
+    if (!skill) {
       return res.status(404).json({
         success: false,
-        message: 'Student not found'
+        message: 'Skill not found'
       });
     }
-
-    await StudentSkill.deleteMany({ userId });
 
     res.status(200).json({
       success: true,
-      message: 'All student skills deleted successfully'
+      data: skill
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting student skills',
+      message: 'Error fetching skill',
+      error: error.message
+    });
+  }
+};
+
+// Admin: Update student skill
+const updateAdminStudentSkill = async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can update skills'
+      });
+    }
+
+    const { id } = req.params;
+    const { name, level } = req.body;
+
+    const skill = await StudentSkill.findByIdAndUpdate(
+      id,
+      { name, level },
+      { new: true, runValidators: true }
+    );
+
+    if (!skill) {
+      return res.status(404).json({
+        success: false,
+        message: 'Skill not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Skill updated successfully',
+      data: skill
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error updating skill',
+      error: error.message
+    });
+  }
+};
+
+// Admin: Delete student skill
+const deleteAdminStudentSkill = async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can delete skills'
+      });
+    }
+
+    const { id } = req.params;
+    
+    const skill = await StudentSkill.findByIdAndDelete(id);
+
+    if (!skill) {
+      return res.status(404).json({
+        success: false,
+        message: 'Skill not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Skill deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting skill',
       error: error.message
     });
   }
@@ -244,9 +312,11 @@ const deleteAllStudentSkills = async (req, res) => {
 export {
   createStudentSkill,
   getMyStudentSkills,
-  getPublicStudentSkills,
+  getStudentSkillById,
   updateStudentSkill,
   deleteStudentSkill,
-  getStudentSkills,
-  deleteAllStudentSkills
+  getAllStudentSkills,
+  getAdminStudentSkillById,
+  updateAdminStudentSkill,
+  deleteAdminStudentSkill
 };

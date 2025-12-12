@@ -15,24 +15,16 @@ const studentEducationSchema = new mongoose.Schema({
     type: String,
     trim: true
   },
-  institution: {
+  school: {
     type: String,
     required: true,
     trim: true
   },
-  startDate: {
-    type: Date,
-    required: true
-  },
-  endDate: {
-    type: Date
+  year: {
+    type: String,
+    trim: true
   },
   gpa: {
-    type: Number,
-    min: 0,
-    max: 4.0
-  },
-  description: {
     type: String,
     trim: true
   }

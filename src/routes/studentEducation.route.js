@@ -2,11 +2,13 @@ import express from 'express';
 import { 
   createStudentEducation,
   getMyStudentEducations,
-  getPublicStudentEducations,
+  getStudentEducationById,
   updateStudentEducation,
   deleteStudentEducation,
-  getStudentEducations,
-  deleteAllStudentEducations
+  getAllStudentEducations,
+  getAdminStudentEducationById,
+  updateAdminStudentEducation,
+  deleteAdminStudentEducation
 } from '../controllers/studentEducation.controller.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.middleware.js';
 
@@ -15,14 +17,14 @@ const router = express.Router();
 // Student routes (protected)
 router.post('/', authMiddleware, createStudentEducation);
 router.get('/my', authMiddleware, getMyStudentEducations);
+router.get('/:id', authMiddleware, getStudentEducationById);
 router.put('/:id', authMiddleware, updateStudentEducation);
 router.delete('/:id', authMiddleware, deleteStudentEducation);
 
-// Public route (no authentication required)
-router.get('/public/:userId', getPublicStudentEducations);
-
 // Admin routes (protected + admin authorization)
-router.get('/:userId', authMiddleware, adminAuth, getStudentEducations);
-router.delete('/:userId/all', authMiddleware, adminAuth, deleteAllStudentEducations);
+router.get('/', authMiddleware, adminAuth, getAllStudentEducations);
+router.get('/:id/admin', authMiddleware, adminAuth, getAdminStudentEducationById);
+router.put('/:id/admin', authMiddleware, adminAuth, updateAdminStudentEducation);
+router.delete('/:id/admin', authMiddleware, adminAuth, deleteAdminStudentEducation);
 
 export default router;

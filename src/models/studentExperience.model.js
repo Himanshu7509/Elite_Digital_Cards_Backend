@@ -8,28 +8,25 @@ const studentExperienceSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    required: true,
     trim: true
   },
   company: {
     type: String,
-    required: true,
     trim: true
   },
-  startDate: {
-    type: Date,
-    required: true
-  },
-  endDate: {
-    type: Date
-  },
-  description: {
+  duration: {
     type: String,
     trim: true
   },
-  isCurrent: {
-    type: Boolean,
-    default: false
+  desc: {
+    type: String,
+    trim: true
+  },
+  startDate: {
+    type: Date
+  },
+  endDate: {
+    type: Date
   }
 }, {
   timestamps: true

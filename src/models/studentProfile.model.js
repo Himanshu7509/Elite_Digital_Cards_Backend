@@ -54,7 +54,7 @@ const studentProfileSchema = new mongoose.Schema({
   },
   templateId: {
     type: String,
-    default: "template111"
+    default: "template1"
   }
 }, {
   timestamps: true

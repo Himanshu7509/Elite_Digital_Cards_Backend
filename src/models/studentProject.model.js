@@ -11,20 +11,19 @@ const studentProjectSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
-  description: {
-    type: String,
-    required: true,
-    trim: true
-  },
-  technologies: [{
-    type: String,
-    trim: true
-  }],
-  projectUrl: {
+  desc: {
     type: String,
     trim: true
   },
-  imageUrl: {
+  tech: {
+    type: String,
+    trim: true
+  },
+  link: {
+    type: String,
+    trim: true
+  },
+  category: {
     type: String,
     trim: true
   }

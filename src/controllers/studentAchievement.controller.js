@@ -1,325 +1,323 @@
-import StudentProject from '../models/studentProject.model.js';
+import StudentAchievement from '../models/studentAchievement.model.js';
 
-// Create student project
-const createStudentProject = async (req, res) => {
+// Create student achievement
+const createStudentAchievement = async (req, res) => {
   try {
-    const { title, desc, tech, link, category } = req.body;
+    const { title, desc, date } = req.body;
 
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can create projects'
+        message: 'Only students can create achievements'
       });
     }
 
-    const project = new StudentProject({
+    const achievement = new StudentAchievement({
       userId: req.user.id,
       title,
       desc,
-      tech,
-      link,
-      category
+      date
     });
 
-    await project.save();
+    await achievement.save();
 
     res.status(201).json({
       success: true,
-      message: 'Project created successfully',
-      data: project
+      message: 'Achievement created successfully',
+      data: achievement
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error creating project',
+      message: 'Error creating achievement',
       error: error.message
     });
   }
 };
 
-// Get all projects for the student
-const getMyStudentProjects = async (req, res) => {
+// Get all achievements for the student
+const getMyStudentAchievements = async (req, res) => {
   try {
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can access projects'
+        message: 'Only students can access achievements'
       });
     }
 
-    const projects = await StudentProject.find({ userId: req.user.id });
+    const achievements = await StudentAchievement.find({ userId: req.user.id });
     
     res.status(200).json({
       success: true,
-      data: projects
+      data: achievements
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching projects',
+      message: 'Error fetching achievements',
       error: error.message
     });
   }
 };
 
-// Get project by ID
-const getStudentProjectById = async (req, res) => {
+// Get achievement by ID
+const getStudentAchievementById = async (req, res) => {
   try {
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can access projects'
+        message: 'Only students can access achievements'
       });
     }
 
     const { id } = req.params;
     
-    const project = await StudentProject.findOne({ _id: id, userId: req.user.id });
+    const achievement = await StudentAchievement.findOne({ _id: id, userId: req.user.id });
     
-    if (!project) {
+    if (!achievement) {
       return res.status(404).json({
         success: false,
-        message: 'Project not found'
+        message: 'Achievement not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      data: project
+      data: achievement
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching project',
+      message: 'Error fetching achievement',
       error: error.message
     });
   }
 };
 
-// Update student project
-const updateStudentProject = async (req, res) => {
+// Update student achievement
+const updateStudentAchievement = async (req, res) => {
   try {
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can update projects'
+        message: 'Only students can update achievements'
       });
     }
 
     const { id } = req.params;
-    const { title, desc, tech, link, category } = req.body;
+    const { title, desc, date } = req.body;
 
-    const project = await StudentProject.findOneAndUpdate(
+    const achievement = await StudentAchievement.findOneAndUpdate(
       { _id: id, userId: req.user.id },
-      { title, desc, tech, link, category },
+      { title, desc, date },
       { new: true, runValidators: true }
     );
 
-    if (!project) {
+    if (!achievement) {
       return res.status(404).json({
         success: false,
-        message: 'Project not found'
+        message: 'Achievement not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Project updated successfully',
-      data: project
+      message: 'Achievement updated successfully',
+      data: achievement
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error updating project',
+      message: 'Error updating achievement',
       error: error.message
     });
   }
 };
 
-// Delete student project
-const deleteStudentProject = async (req, res) => {
+// Delete student achievement
+const deleteStudentAchievement = async (req, res) => {
   try {
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can delete projects'
+        message: 'Only students can delete achievements'
       });
     }
 
     const { id } = req.params;
     
-    const project = await StudentProject.findOneAndDelete({ _id: id, userId: req.user.id });
+    const achievement = await StudentAchievement.findOneAndDelete({ _id: id, userId: req.user.id });
 
-    if (!project) {
+    if (!achievement) {
       return res.status(404).json({
         success: false,
-        message: 'Project not found'
+        message: 'Achievement not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Project deleted successfully'
+      message: 'Achievement deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting project',
+      message: 'Error deleting achievement',
       error: error.message
     });
   }
 };
 
-// Admin: Get all student projects
-const getAllStudentProjects = async (req, res) => {
+// Admin: Get all student achievements
+const getAllStudentAchievements = async (req, res) => {
   try {
     // Check if user is admin
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can access all projects'
+        message: 'Only admins can access all achievements'
       });
     }
 
-    const projects = await StudentProject.find().populate('userId', 'email role');
+    const achievements = await StudentAchievement.find().populate('userId', 'email role');
     
     res.status(200).json({
       success: true,
-      data: projects
+      data: achievements
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching projects',
+      message: 'Error fetching achievements',
       error: error.message
     });
   }
 };
 
-// Admin: Get specific student project
-const getAdminStudentProjectById = async (req, res) => {
+// Admin: Get specific student achievement
+const getAdminStudentAchievementById = async (req, res) => {
   try {
     // Check if user is admin
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can access projects'
+        message: 'Only admins can access achievements'
       });
     }
 
     const { id } = req.params;
     
-    const project = await StudentProject.findById(id).populate('userId', 'email role');
+    const achievement = await StudentAchievement.findById(id).populate('userId', 'email role');
     
-    if (!project) {
+    if (!achievement) {
       return res.status(404).json({
         success: false,
-        message: 'Project not found'
+        message: 'Achievement not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      data: project
+      data: achievement
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching project',
+      message: 'Error fetching achievement',
       error: error.message
     });
   }
 };
 
-// Admin: Update student project
-const updateAdminStudentProject = async (req, res) => {
+// Admin: Update student achievement
+const updateAdminStudentAchievement = async (req, res) => {
   try {
     // Check if user is admin
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can update projects'
+        message: 'Only admins can update achievements'
       });
     }
 
     const { id } = req.params;
-    const { title, desc, tech, link, category } = req.body;
+    const { title, desc, date } = req.body;
 
-    const project = await StudentProject.findByIdAndUpdate(
+    const achievement = await StudentAchievement.findByIdAndUpdate(
       id,
-      { title, desc, tech, link, category },
+      { title, desc, date },
       { new: true, runValidators: true }
     );
 
-    if (!project) {
+    if (!achievement) {
       return res.status(404).json({
         success: false,
-        message: 'Project not found'
+        message: 'Achievement not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Project updated successfully',
-      data: project
+      message: 'Achievement updated successfully',
+      data: achievement
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error updating project',
+      message: 'Error updating achievement',
       error: error.message
     });
   }
 };
 
-// Admin: Delete student project
-const deleteAdminStudentProject = async (req, res) => {
+// Admin: Delete student achievement
+const deleteAdminStudentAchievement = async (req, res) => {
   try {
     // Check if user is admin
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can delete projects'
+        message: 'Only admins can delete achievements'
       });
     }
 
     const { id } = req.params;
     
-    const project = await StudentProject.findByIdAndDelete(id);
+    const achievement = await StudentAchievement.findByIdAndDelete(id);
 
-    if (!project) {
+    if (!achievement) {
       return res.status(404).json({
         success: false,
-        message: 'Project not found'
+        message: 'Achievement not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Project deleted successfully'
+      message: 'Achievement deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting project',
+      message: 'Error deleting achievement',
       error: error.message
     });
   }
 };
 
 export {
-  createStudentProject,
-  getMyStudentProjects,
-  getStudentProjectById,
-  updateStudentProject,
-  deleteStudentProject,
-  getAllStudentProjects,
-  getAdminStudentProjectById,
-  updateAdminStudentProject,
-  deleteAdminStudentProject
+  createStudentAchievement,
+  getMyStudentAchievements,
+  getStudentAchievementById,
+  updateStudentAchievement,
+  deleteStudentAchievement,
+  getAllStudentAchievements,
+  getAdminStudentAchievementById,
+  updateAdminStudentAchievement,
+  deleteAdminStudentAchievement
 };

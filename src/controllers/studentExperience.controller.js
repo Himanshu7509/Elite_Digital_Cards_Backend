@@ -1,58 +1,57 @@
 import StudentExperience from '../models/studentExperience.model.js';
-import User from '../models/auth.model.js';
 
-// Create a new student experience
+// Create student experience
 const createStudentExperience = async (req, res) => {
   try {
+    const { role, company, duration, desc, startDate, endDate } = req.body;
+
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can create experiences'
+        message: 'Only students can create experience records'
       });
     }
-
-    const { role, company, startDate, endDate, description, isCurrent } = req.body;
 
     const experience = new StudentExperience({
       userId: req.user.id,
       role,
       company,
+      duration,
+      desc,
       startDate,
-      endDate,
-      description,
-      isCurrent
+      endDate
     });
 
     await experience.save();
 
     res.status(201).json({
       success: true,
-      message: 'Student experience created successfully',
+      message: 'Experience record created successfully',
       data: experience
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error creating student experience',
+      message: 'Error creating experience record',
       error: error.message
     });
   }
 };
 
-// Get all experiences for the logged-in student
+// Get all experience records for the student
 const getMyStudentExperiences = async (req, res) => {
   try {
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can access their experiences'
+        message: 'Only students can access experience records'
       });
     }
 
-    const experiences = await StudentExperience.find({ userId: req.user.id }).sort({ startDate: -1 });
-
+    const experiences = await StudentExperience.find({ userId: req.user.id });
+    
     res.status(200).json({
       success: true,
       data: experiences
@@ -60,141 +59,136 @@ const getMyStudentExperiences = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching student experiences',
+      message: 'Error fetching experience records',
       error: error.message
     });
   }
 };
 
-// Get public experiences for a student (read-only access for anyone)
-const getPublicStudentExperiences = async (req, res) => {
+// Get experience record by ID
+const getStudentExperienceById = async (req, res) => {
   try {
-    const { userId } = req.params;
+    // Check if user has student role
+    if (req.user.role !== 'student') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only students can access experience records'
+      });
+    }
 
-    // Check if user exists and is a student
-    const user = await User.findById(userId);
-    if (!user || user.role !== 'student') {
+    const { id } = req.params;
+    
+    const experience = await StudentExperience.findOne({ _id: id, userId: req.user.id });
+    
+    if (!experience) {
       return res.status(404).json({
         success: false,
-        message: 'Student not found'
+        message: 'Experience record not found'
       });
     }
 
-    const experiences = await StudentExperience.find({ userId }).sort({ startDate: -1 });
-
     res.status(200).json({
       success: true,
-      data: experiences
+      data: experience
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching student experiences',
+      message: 'Error fetching experience record',
       error: error.message
     });
   }
 };
 
-// Update a student experience
+// Update student experience record
 const updateStudentExperience = async (req, res) => {
   try {
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can update their experiences'
+        message: 'Only students can update experience records'
       });
     }
 
     const { id } = req.params;
-    const { role, company, startDate, endDate, description, isCurrent } = req.body;
+    const { role, company, duration, desc, startDate, endDate } = req.body;
 
     const experience = await StudentExperience.findOneAndUpdate(
       { _id: id, userId: req.user.id },
-      { role, company, startDate, endDate, description, isCurrent },
+      { role, company, duration, desc, startDate, endDate },
       { new: true, runValidators: true }
     );
 
     if (!experience) {
       return res.status(404).json({
         success: false,
-        message: 'Student experience not found'
+        message: 'Experience record not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Student experience updated successfully',
+      message: 'Experience record updated successfully',
       data: experience
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error updating student experience',
+      message: 'Error updating experience record',
       error: error.message
     });
   }
 };
 
-// Delete a student experience
+// Delete student experience record
 const deleteStudentExperience = async (req, res) => {
   try {
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can delete their experiences'
+        message: 'Only students can delete experience records'
       });
     }
 
     const { id } = req.params;
-
+    
     const experience = await StudentExperience.findOneAndDelete({ _id: id, userId: req.user.id });
 
     if (!experience) {
       return res.status(404).json({
         success: false,
-        message: 'Student experience not found'
+        message: 'Experience record not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Student experience deleted successfully'
+      message: 'Experience record deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting student experience',
+      message: 'Error deleting experience record',
       error: error.message
     });
   }
 };
 
-// Admin: Get all experiences for a specific student
-const getStudentExperiences = async (req, res) => {
+// Admin: Get all student experience records
+const getAllStudentExperiences = async (req, res) => {
   try {
     // Check if user is admin
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can access student experiences'
+        message: 'Only admins can access all experience records'
       });
     }
 
-    const { userId } = req.params;
-
-    // Check if user exists and is a student
-    const user = await User.findById(userId);
-    if (!user || user.role !== 'student') {
-      return res.status(404).json({
-        success: false,
-        message: 'Student not found'
-      });
-    }
-
-    const experiences = await StudentExperience.find({ userId }).sort({ startDate: -1 });
-
+    const experiences = await StudentExperience.find().populate('userId', 'email role');
+    
     res.status(200).json({
       success: true,
       data: experiences
@@ -202,44 +196,118 @@ const getStudentExperiences = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching student experiences',
+      message: 'Error fetching experience records',
       error: error.message
     });
   }
 };
 
-// Admin: Delete all experiences for a specific student
-const deleteAllStudentExperiences = async (req, res) => {
+// Admin: Get specific student experience record
+const getAdminStudentExperienceById = async (req, res) => {
   try {
     // Check if user is admin
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can delete student experiences'
+        message: 'Only admins can access experience records'
       });
     }
 
-    const { userId } = req.params;
-
-    // Check if user exists and is a student
-    const user = await User.findById(userId);
-    if (!user || user.role !== 'student') {
+    const { id } = req.params;
+    
+    const experience = await StudentExperience.findById(id).populate('userId', 'email role');
+    
+    if (!experience) {
       return res.status(404).json({
         success: false,
-        message: 'Student not found'
+        message: 'Experience record not found'
       });
     }
-
-    await StudentExperience.deleteMany({ userId });
 
     res.status(200).json({
       success: true,
-      message: 'All student experiences deleted successfully'
+      data: experience
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting student experiences',
+      message: 'Error fetching experience record',
+      error: error.message
+    });
+  }
+};
+
+// Admin: Update student experience record
+const updateAdminStudentExperience = async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can update experience records'
+      });
+    }
+
+    const { id } = req.params;
+    const { role, company, duration, desc, startDate, endDate } = req.body;
+
+    const experience = await StudentExperience.findByIdAndUpdate(
+      id,
+      { role, company, duration, desc, startDate, endDate },
+      { new: true, runValidators: true }
+    );
+
+    if (!experience) {
+      return res.status(404).json({
+        success: false,
+        message: 'Experience record not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Experience record updated successfully',
+      data: experience
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error updating experience record',
+      error: error.message
+    });
+  }
+};
+
+// Admin: Delete student experience record
+const deleteAdminStudentExperience = async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can delete experience records'
+      });
+    }
+
+    const { id } = req.params;
+    
+    const experience = await StudentExperience.findByIdAndDelete(id);
+
+    if (!experience) {
+      return res.status(404).json({
+        success: false,
+        message: 'Experience record not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Experience record deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting experience record',
       error: error.message
     });
   }
@@ -248,9 +316,11 @@ const deleteAllStudentExperiences = async (req, res) => {
 export {
   createStudentExperience,
   getMyStudentExperiences,
-  getPublicStudentExperiences,
+  getStudentExperienceById,
   updateStudentExperience,
   deleteStudentExperience,
-  getStudentExperiences,
-  deleteAllStudentExperiences
+  getAllStudentExperiences,
+  getAdminStudentExperienceById,
+  updateAdminStudentExperience,
+  deleteAdminStudentExperience
 };

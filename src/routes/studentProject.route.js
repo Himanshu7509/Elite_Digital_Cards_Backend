@@ -1,31 +1,30 @@
 import express from 'express';
 import { 
   createStudentProject,
-  uploadStudentProjectImage,
   getMyStudentProjects,
-  getPublicStudentProjects,
+  getStudentProjectById,
   updateStudentProject,
   deleteStudentProject,
-  getStudentProjects,
-  deleteAllStudentProjects,
-  upload
+  getAllStudentProjects,
+  getAdminStudentProjectById,
+  updateAdminStudentProject,
+  deleteAdminStudentProject
 } from '../controllers/studentProject.controller.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
 // Student routes (protected)
-router.post('/', authMiddleware, upload.single('projectImage'), createStudentProject);
-router.post('/upload/image', authMiddleware, upload.single('projectImage'), uploadStudentProjectImage);
+router.post('/', authMiddleware, createStudentProject);
 router.get('/my', authMiddleware, getMyStudentProjects);
+router.get('/:id', authMiddleware, getStudentProjectById);
 router.put('/:id', authMiddleware, updateStudentProject);
 router.delete('/:id', authMiddleware, deleteStudentProject);
 
-// Public route (no authentication required)
-router.get('/public/:userId', getPublicStudentProjects);
-
 // Admin routes (protected + admin authorization)
-router.get('/:userId', authMiddleware, adminAuth, getStudentProjects);
-router.delete('/:userId/all', authMiddleware, adminAuth, deleteAllStudentProjects);
+router.get('/', authMiddleware, adminAuth, getAllStudentProjects);
+router.get('/:id/admin', authMiddleware, adminAuth, getAdminStudentProjectById);
+router.put('/:id/admin', authMiddleware, adminAuth, updateAdminStudentProject);
+router.delete('/:id/admin', authMiddleware, adminAuth, deleteAdminStudentProject);
 
 export default router;
