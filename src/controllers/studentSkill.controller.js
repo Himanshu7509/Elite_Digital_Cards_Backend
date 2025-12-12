@@ -172,6 +172,27 @@ const deleteStudentSkill = async (req, res) => {
   }
 };
 
+// Get all skills for a student (public access)
+const getPublicStudentSkills = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Find all skills for the specified user ID
+    const skills = await StudentSkill.find({ userId: userId });
+    
+    res.status(200).json({
+      success: true,
+      data: skills
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching skills',
+      error: error.message
+    });
+  }
+};
+
 // Admin: Get all student skills
 const getAllStudentSkills = async (req, res) => {
   try {
@@ -245,13 +266,13 @@ const updateAdminStudentSkill = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { name, level } = req.body;
+    const { name, level, userId } = req.body;
 
     const skill = await StudentSkill.findByIdAndUpdate(
       id,
-      { name, level },
+      { name, level, userId },
       { new: true, runValidators: true }
-    );
+    ).populate('userId', 'email role');
 
     if (!skill) {
       return res.status(404).json({
@@ -318,5 +339,6 @@ export {
   getAllStudentSkills,
   getAdminStudentSkillById,
   updateAdminStudentSkill,
-  deleteAdminStudentSkill
+  deleteAdminStudentSkill,
+  getPublicStudentSkills // Export the new function
 };

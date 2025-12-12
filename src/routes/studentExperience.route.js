@@ -8,7 +8,8 @@ import {
   getAllStudentExperiences,
   getAdminStudentExperienceById,
   updateAdminStudentExperience,
-  deleteAdminStudentExperience
+  deleteAdminStudentExperience,
+  getPublicStudentExperiences // Add this import
 } from '../controllers/studentExperience.controller.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.middleware.js';
 
@@ -20,6 +21,9 @@ router.get('/my', authMiddleware, getMyStudentExperiences);
 router.get('/:id', authMiddleware, getStudentExperienceById);
 router.put('/:id', authMiddleware, updateStudentExperience);
 router.delete('/:id', authMiddleware, deleteStudentExperience);
+
+// Public route (no authentication required)
+router.get('/public/:userId', getPublicStudentExperiences); // Add this route
 
 // Admin routes (protected + admin authorization)
 router.get('/', authMiddleware, adminAuth, getAllStudentExperiences);

@@ -3,7 +3,7 @@ import StudentExperience from '../models/studentExperience.model.js';
 // Create student experience
 const createStudentExperience = async (req, res) => {
   try {
-    const { role, company, duration, desc, startDate, endDate } = req.body;
+    const { companyName, position, startDate, endDate, description } = req.body;
 
     // Check if user has student role
     if (req.user.role !== 'student') {
@@ -15,12 +15,11 @@ const createStudentExperience = async (req, res) => {
 
     const experience = new StudentExperience({
       userId: req.user.id,
-      role,
-      company,
-      duration,
-      desc,
+      companyName,
+      position,
       startDate,
-      endDate
+      endDate,
+      description
     });
 
     await experience.save();
@@ -39,7 +38,7 @@ const createStudentExperience = async (req, res) => {
   }
 };
 
-// Get all experience records for the student
+// Get all experiences for the student
 const getMyStudentExperiences = async (req, res) => {
   try {
     // Check if user has student role
@@ -65,7 +64,7 @@ const getMyStudentExperiences = async (req, res) => {
   }
 };
 
-// Get experience record by ID
+// Get experience by ID
 const getStudentExperienceById = async (req, res) => {
   try {
     // Check if user has student role
@@ -100,7 +99,7 @@ const getStudentExperienceById = async (req, res) => {
   }
 };
 
-// Update student experience record
+// Update student experience
 const updateStudentExperience = async (req, res) => {
   try {
     // Check if user has student role
@@ -112,11 +111,11 @@ const updateStudentExperience = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { role, company, duration, desc, startDate, endDate } = req.body;
+    const { companyName, position, startDate, endDate, description } = req.body;
 
     const experience = await StudentExperience.findOneAndUpdate(
       { _id: id, userId: req.user.id },
-      { role, company, duration, desc, startDate, endDate },
+      { companyName, position, startDate, endDate, description },
       { new: true, runValidators: true }
     );
 
@@ -141,7 +140,7 @@ const updateStudentExperience = async (req, res) => {
   }
 };
 
-// Delete student experience record
+// Delete student experience
 const deleteStudentExperience = async (req, res) => {
   try {
     // Check if user has student role
@@ -176,7 +175,28 @@ const deleteStudentExperience = async (req, res) => {
   }
 };
 
-// Admin: Get all student experience records
+// Get all experiences for a student (public access)
+const getPublicStudentExperiences = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Find all experiences for the specified user ID
+    const experiences = await StudentExperience.find({ userId: userId });
+    
+    res.status(200).json({
+      success: true,
+      data: experiences
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching experience records',
+      error: error.message
+    });
+  }
+};
+
+// Admin: Get all student experiences
 const getAllStudentExperiences = async (req, res) => {
   try {
     // Check if user is admin
@@ -202,7 +222,7 @@ const getAllStudentExperiences = async (req, res) => {
   }
 };
 
-// Admin: Get specific student experience record
+// Admin: Get specific student experience
 const getAdminStudentExperienceById = async (req, res) => {
   try {
     // Check if user is admin
@@ -237,7 +257,7 @@ const getAdminStudentExperienceById = async (req, res) => {
   }
 };
 
-// Admin: Update student experience record
+// Admin: Update student experience
 const updateAdminStudentExperience = async (req, res) => {
   try {
     // Check if user is admin
@@ -249,13 +269,13 @@ const updateAdminStudentExperience = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { role, company, duration, desc, startDate, endDate } = req.body;
+    const { companyName, position, startDate, endDate, description, userId } = req.body;
 
     const experience = await StudentExperience.findByIdAndUpdate(
       id,
-      { role, company, duration, desc, startDate, endDate },
+      { companyName, position, startDate, endDate, description, userId },
       { new: true, runValidators: true }
-    );
+    ).populate('userId', 'email role');
 
     if (!experience) {
       return res.status(404).json({
@@ -278,7 +298,7 @@ const updateAdminStudentExperience = async (req, res) => {
   }
 };
 
-// Admin: Delete student experience record
+// Admin: Delete student experience
 const deleteAdminStudentExperience = async (req, res) => {
   try {
     // Check if user is admin
@@ -322,5 +342,6 @@ export {
   getAllStudentExperiences,
   getAdminStudentExperienceById,
   updateAdminStudentExperience,
-  deleteAdminStudentExperience
+  deleteAdminStudentExperience,
+  getPublicStudentExperiences // Export the new function
 };

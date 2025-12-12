@@ -3,7 +3,7 @@ import StudentEducation from '../models/studentEducation.model.js';
 // Create student education
 const createStudentEducation = async (req, res) => {
   try {
-    const { degree, major, school, year, gpa } = req.body;
+    const { institutionName, degree, fieldOfStudy, startDate, endDate, grade, description } = req.body;
 
     // Check if user has student role
     if (req.user.role !== 'student') {
@@ -15,11 +15,13 @@ const createStudentEducation = async (req, res) => {
 
     const education = new StudentEducation({
       userId: req.user.id,
+      institutionName,
       degree,
-      major,
-      school,
-      year,
-      gpa
+      fieldOfStudy,
+      startDate,
+      endDate,
+      grade,
+      description
     });
 
     await education.save();
@@ -38,7 +40,7 @@ const createStudentEducation = async (req, res) => {
   }
 };
 
-// Get all education records for the student
+// Get all educations for the student
 const getMyStudentEducations = async (req, res) => {
   try {
     // Check if user has student role
@@ -64,7 +66,7 @@ const getMyStudentEducations = async (req, res) => {
   }
 };
 
-// Get education record by ID
+// Get education by ID
 const getStudentEducationById = async (req, res) => {
   try {
     // Check if user has student role
@@ -99,7 +101,7 @@ const getStudentEducationById = async (req, res) => {
   }
 };
 
-// Update student education record
+// Update student education
 const updateStudentEducation = async (req, res) => {
   try {
     // Check if user has student role
@@ -111,11 +113,11 @@ const updateStudentEducation = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { degree, major, school, year, gpa } = req.body;
+    const { institutionName, degree, fieldOfStudy, startDate, endDate, grade, description } = req.body;
 
     const education = await StudentEducation.findOneAndUpdate(
       { _id: id, userId: req.user.id },
-      { degree, major, school, year, gpa },
+      { institutionName, degree, fieldOfStudy, startDate, endDate, grade, description },
       { new: true, runValidators: true }
     );
 
@@ -140,7 +142,7 @@ const updateStudentEducation = async (req, res) => {
   }
 };
 
-// Delete student education record
+// Delete student education
 const deleteStudentEducation = async (req, res) => {
   try {
     // Check if user has student role
@@ -175,7 +177,28 @@ const deleteStudentEducation = async (req, res) => {
   }
 };
 
-// Admin: Get all student education records
+// Get all educations for a student (public access)
+const getPublicStudentEducations = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Find all educations for the specified user ID
+    const educations = await StudentEducation.find({ userId: userId });
+    
+    res.status(200).json({
+      success: true,
+      data: educations
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching education records',
+      error: error.message
+    });
+  }
+};
+
+// Admin: Get all student educations
 const getAllStudentEducations = async (req, res) => {
   try {
     // Check if user is admin
@@ -201,7 +224,7 @@ const getAllStudentEducations = async (req, res) => {
   }
 };
 
-// Admin: Get specific student education record
+// Admin: Get specific student education
 const getAdminStudentEducationById = async (req, res) => {
   try {
     // Check if user is admin
@@ -236,7 +259,7 @@ const getAdminStudentEducationById = async (req, res) => {
   }
 };
 
-// Admin: Update student education record
+// Admin: Update student education
 const updateAdminStudentEducation = async (req, res) => {
   try {
     // Check if user is admin
@@ -248,13 +271,13 @@ const updateAdminStudentEducation = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { degree, major, school, year, gpa } = req.body;
+    const { institutionName, degree, fieldOfStudy, startDate, endDate, grade, description, userId } = req.body;
 
     const education = await StudentEducation.findByIdAndUpdate(
       id,
-      { degree, major, school, year, gpa },
+      { institutionName, degree, fieldOfStudy, startDate, endDate, grade, description, userId },
       { new: true, runValidators: true }
-    );
+    ).populate('userId', 'email role');
 
     if (!education) {
       return res.status(404).json({
@@ -277,7 +300,7 @@ const updateAdminStudentEducation = async (req, res) => {
   }
 };
 
-// Admin: Delete student education record
+// Admin: Delete student education
 const deleteAdminStudentEducation = async (req, res) => {
   try {
     // Check if user is admin
@@ -321,5 +344,6 @@ export {
   getAllStudentEducations,
   getAdminStudentEducationById,
   updateAdminStudentEducation,
-  deleteAdminStudentEducation
+  deleteAdminStudentEducation,
+  getPublicStudentEducations // Export the new function
 };

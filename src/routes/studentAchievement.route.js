@@ -8,7 +8,8 @@ import {
   getAllStudentAchievements,
   getAdminStudentAchievementById,
   updateAdminStudentAchievement,
-  deleteAdminStudentAchievement
+  deleteAdminStudentAchievement,
+  getPublicStudentAchievements // Add this import
 } from '../controllers/studentAchievement.controller.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.middleware.js';
 
@@ -20,6 +21,9 @@ router.get('/my', authMiddleware, getMyStudentAchievements);
 router.get('/:id', authMiddleware, getStudentAchievementById);
 router.put('/:id', authMiddleware, updateStudentAchievement);
 router.delete('/:id', authMiddleware, deleteStudentAchievement);
+
+// Public route (no authentication required)
+router.get('/public/:userId', getPublicStudentAchievements); // Add this route
 
 // Admin routes (protected + admin authorization)
 router.get('/', authMiddleware, adminAuth, getAllStudentAchievements);

@@ -3,34 +3,36 @@ import StudentAchievement from '../models/studentAchievement.model.js';
 // Create student achievement
 const createStudentAchievement = async (req, res) => {
   try {
-    const { title, desc, date } = req.body;
+    const { title, issuer, date, description, certificateUrl } = req.body;
 
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can create achievements'
+        message: 'Only students can create achievement records'
       });
     }
 
     const achievement = new StudentAchievement({
       userId: req.user.id,
       title,
-      desc,
-      date
+      issuer,
+      date,
+      description,
+      certificateUrl
     });
 
     await achievement.save();
 
     res.status(201).json({
       success: true,
-      message: 'Achievement created successfully',
+      message: 'Achievement record created successfully',
       data: achievement
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error creating achievement',
+      message: 'Error creating achievement record',
       error: error.message
     });
   }
@@ -43,7 +45,7 @@ const getMyStudentAchievements = async (req, res) => {
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can access achievements'
+        message: 'Only students can access achievement records'
       });
     }
 
@@ -56,7 +58,7 @@ const getMyStudentAchievements = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching achievements',
+      message: 'Error fetching achievement records',
       error: error.message
     });
   }
@@ -69,7 +71,7 @@ const getStudentAchievementById = async (req, res) => {
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can access achievements'
+        message: 'Only students can access achievement records'
       });
     }
 
@@ -80,7 +82,7 @@ const getStudentAchievementById = async (req, res) => {
     if (!achievement) {
       return res.status(404).json({
         success: false,
-        message: 'Achievement not found'
+        message: 'Achievement record not found'
       });
     }
 
@@ -91,7 +93,7 @@ const getStudentAchievementById = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching achievement',
+      message: 'Error fetching achievement record',
       error: error.message
     });
   }
@@ -104,35 +106,35 @@ const updateStudentAchievement = async (req, res) => {
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can update achievements'
+        message: 'Only students can update achievement records'
       });
     }
 
     const { id } = req.params;
-    const { title, desc, date } = req.body;
+    const { title, issuer, date, description, certificateUrl } = req.body;
 
     const achievement = await StudentAchievement.findOneAndUpdate(
       { _id: id, userId: req.user.id },
-      { title, desc, date },
+      { title, issuer, date, description, certificateUrl },
       { new: true, runValidators: true }
     );
 
     if (!achievement) {
       return res.status(404).json({
         success: false,
-        message: 'Achievement not found'
+        message: 'Achievement record not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Achievement updated successfully',
+      message: 'Achievement record updated successfully',
       data: achievement
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error updating achievement',
+      message: 'Error updating achievement record',
       error: error.message
     });
   }
@@ -145,7 +147,7 @@ const deleteStudentAchievement = async (req, res) => {
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can delete achievements'
+        message: 'Only students can delete achievement records'
       });
     }
 
@@ -156,18 +158,39 @@ const deleteStudentAchievement = async (req, res) => {
     if (!achievement) {
       return res.status(404).json({
         success: false,
-        message: 'Achievement not found'
+        message: 'Achievement record not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Achievement deleted successfully'
+      message: 'Achievement record deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting achievement',
+      message: 'Error deleting achievement record',
+      error: error.message
+    });
+  }
+};
+
+// Get all achievements for a student (public access)
+const getPublicStudentAchievements = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Find all achievements for the specified user ID
+    const achievements = await StudentAchievement.find({ userId: userId });
+    
+    res.status(200).json({
+      success: true,
+      data: achievements
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching achievement records',
       error: error.message
     });
   }
@@ -180,7 +203,7 @@ const getAllStudentAchievements = async (req, res) => {
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can access all achievements'
+        message: 'Only admins can access all achievement records'
       });
     }
 
@@ -193,7 +216,7 @@ const getAllStudentAchievements = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching achievements',
+      message: 'Error fetching achievement records',
       error: error.message
     });
   }
@@ -206,7 +229,7 @@ const getAdminStudentAchievementById = async (req, res) => {
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can access achievements'
+        message: 'Only admins can access achievement records'
       });
     }
 
@@ -217,7 +240,7 @@ const getAdminStudentAchievementById = async (req, res) => {
     if (!achievement) {
       return res.status(404).json({
         success: false,
-        message: 'Achievement not found'
+        message: 'Achievement record not found'
       });
     }
 
@@ -228,7 +251,7 @@ const getAdminStudentAchievementById = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching achievement',
+      message: 'Error fetching achievement record',
       error: error.message
     });
   }
@@ -241,35 +264,35 @@ const updateAdminStudentAchievement = async (req, res) => {
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can update achievements'
+        message: 'Only admins can update achievement records'
       });
     }
 
     const { id } = req.params;
-    const { title, desc, date } = req.body;
+    const { title, issuer, date, description, certificateUrl, userId } = req.body;
 
     const achievement = await StudentAchievement.findByIdAndUpdate(
       id,
-      { title, desc, date },
+      { title, issuer, date, description, certificateUrl, userId },
       { new: true, runValidators: true }
-    );
+    ).populate('userId', 'email role');
 
     if (!achievement) {
       return res.status(404).json({
         success: false,
-        message: 'Achievement not found'
+        message: 'Achievement record not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Achievement updated successfully',
+      message: 'Achievement record updated successfully',
       data: achievement
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error updating achievement',
+      message: 'Error updating achievement record',
       error: error.message
     });
   }
@@ -282,7 +305,7 @@ const deleteAdminStudentAchievement = async (req, res) => {
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can delete achievements'
+        message: 'Only admins can delete achievement records'
       });
     }
 
@@ -293,18 +316,18 @@ const deleteAdminStudentAchievement = async (req, res) => {
     if (!achievement) {
       return res.status(404).json({
         success: false,
-        message: 'Achievement not found'
+        message: 'Achievement record not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Achievement deleted successfully'
+      message: 'Achievement record deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting achievement',
+      message: 'Error deleting achievement record',
       error: error.message
     });
   }
@@ -319,5 +342,6 @@ export {
   getAllStudentAchievements,
   getAdminStudentAchievementById,
   updateAdminStudentAchievement,
-  deleteAdminStudentAchievement
+  deleteAdminStudentAchievement,
+  getPublicStudentAchievements // Export the new function
 };

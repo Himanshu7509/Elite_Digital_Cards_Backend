@@ -8,7 +8,8 @@ import {
   getAllStudentProjects,
   getAdminStudentProjectById,
   updateAdminStudentProject,
-  deleteAdminStudentProject
+  deleteAdminStudentProject,
+  getPublicStudentProjects // Add this import
 } from '../controllers/studentProject.controller.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.middleware.js';
 
@@ -20,6 +21,9 @@ router.get('/my', authMiddleware, getMyStudentProjects);
 router.get('/:id', authMiddleware, getStudentProjectById);
 router.put('/:id', authMiddleware, updateStudentProject);
 router.delete('/:id', authMiddleware, deleteStudentProject);
+
+// Public route (no authentication required)
+router.get('/public/:userId', getPublicStudentProjects); // Add this route
 
 // Admin routes (protected + admin authorization)
 router.get('/', authMiddleware, adminAuth, getAllStudentProjects);

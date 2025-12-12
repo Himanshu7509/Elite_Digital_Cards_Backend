@@ -3,36 +3,38 @@ import StudentProject from '../models/studentProject.model.js';
 // Create student project
 const createStudentProject = async (req, res) => {
   try {
-    const { title, desc, tech, link, category } = req.body;
+    const { projectName, description, technologies, startDate, endDate, projectUrl, imageUrl } = req.body;
 
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can create projects'
+        message: 'Only students can create project records'
       });
     }
 
     const project = new StudentProject({
       userId: req.user.id,
-      title,
-      desc,
-      tech,
-      link,
-      category
+      projectName,
+      description,
+      technologies,
+      startDate,
+      endDate,
+      projectUrl,
+      imageUrl
     });
 
     await project.save();
 
     res.status(201).json({
       success: true,
-      message: 'Project created successfully',
+      message: 'Project record created successfully',
       data: project
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error creating project',
+      message: 'Error creating project record',
       error: error.message
     });
   }
@@ -45,7 +47,7 @@ const getMyStudentProjects = async (req, res) => {
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can access projects'
+        message: 'Only students can access project records'
       });
     }
 
@@ -58,7 +60,7 @@ const getMyStudentProjects = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching projects',
+      message: 'Error fetching project records',
       error: error.message
     });
   }
@@ -71,7 +73,7 @@ const getStudentProjectById = async (req, res) => {
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can access projects'
+        message: 'Only students can access project records'
       });
     }
 
@@ -82,7 +84,7 @@ const getStudentProjectById = async (req, res) => {
     if (!project) {
       return res.status(404).json({
         success: false,
-        message: 'Project not found'
+        message: 'Project record not found'
       });
     }
 
@@ -93,7 +95,7 @@ const getStudentProjectById = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching project',
+      message: 'Error fetching project record',
       error: error.message
     });
   }
@@ -106,35 +108,35 @@ const updateStudentProject = async (req, res) => {
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can update projects'
+        message: 'Only students can update project records'
       });
     }
 
     const { id } = req.params;
-    const { title, desc, tech, link, category } = req.body;
+    const { projectName, description, technologies, startDate, endDate, projectUrl, imageUrl } = req.body;
 
     const project = await StudentProject.findOneAndUpdate(
       { _id: id, userId: req.user.id },
-      { title, desc, tech, link, category },
+      { projectName, description, technologies, startDate, endDate, projectUrl, imageUrl },
       { new: true, runValidators: true }
     );
 
     if (!project) {
       return res.status(404).json({
         success: false,
-        message: 'Project not found'
+        message: 'Project record not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Project updated successfully',
+      message: 'Project record updated successfully',
       data: project
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error updating project',
+      message: 'Error updating project record',
       error: error.message
     });
   }
@@ -147,7 +149,7 @@ const deleteStudentProject = async (req, res) => {
     if (req.user.role !== 'student') {
       return res.status(403).json({
         success: false,
-        message: 'Only students can delete projects'
+        message: 'Only students can delete project records'
       });
     }
 
@@ -158,18 +160,39 @@ const deleteStudentProject = async (req, res) => {
     if (!project) {
       return res.status(404).json({
         success: false,
-        message: 'Project not found'
+        message: 'Project record not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Project deleted successfully'
+      message: 'Project record deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting project',
+      message: 'Error deleting project record',
+      error: error.message
+    });
+  }
+};
+
+// Get all projects for a student (public access)
+const getPublicStudentProjects = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Find all projects for the specified user ID
+    const projects = await StudentProject.find({ userId: userId });
+    
+    res.status(200).json({
+      success: true,
+      data: projects
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching project records',
       error: error.message
     });
   }
@@ -182,7 +205,7 @@ const getAllStudentProjects = async (req, res) => {
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can access all projects'
+        message: 'Only admins can access all project records'
       });
     }
 
@@ -195,7 +218,7 @@ const getAllStudentProjects = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching projects',
+      message: 'Error fetching project records',
       error: error.message
     });
   }
@@ -208,7 +231,7 @@ const getAdminStudentProjectById = async (req, res) => {
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can access projects'
+        message: 'Only admins can access project records'
       });
     }
 
@@ -219,7 +242,7 @@ const getAdminStudentProjectById = async (req, res) => {
     if (!project) {
       return res.status(404).json({
         success: false,
-        message: 'Project not found'
+        message: 'Project record not found'
       });
     }
 
@@ -230,7 +253,7 @@ const getAdminStudentProjectById = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error fetching project',
+      message: 'Error fetching project record',
       error: error.message
     });
   }
@@ -243,35 +266,35 @@ const updateAdminStudentProject = async (req, res) => {
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can update projects'
+        message: 'Only admins can update project records'
       });
     }
 
     const { id } = req.params;
-    const { title, desc, tech, link, category } = req.body;
+    const { projectName, description, technologies, startDate, endDate, projectUrl, imageUrl, userId } = req.body;
 
     const project = await StudentProject.findByIdAndUpdate(
       id,
-      { title, desc, tech, link, category },
+      { projectName, description, technologies, startDate, endDate, projectUrl, imageUrl, userId },
       { new: true, runValidators: true }
-    );
+    ).populate('userId', 'email role');
 
     if (!project) {
       return res.status(404).json({
         success: false,
-        message: 'Project not found'
+        message: 'Project record not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Project updated successfully',
+      message: 'Project record updated successfully',
       data: project
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error updating project',
+      message: 'Error updating project record',
       error: error.message
     });
   }
@@ -284,7 +307,7 @@ const deleteAdminStudentProject = async (req, res) => {
     if (req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: 'Only admins can delete projects'
+        message: 'Only admins can delete project records'
       });
     }
 
@@ -295,18 +318,18 @@ const deleteAdminStudentProject = async (req, res) => {
     if (!project) {
       return res.status(404).json({
         success: false,
-        message: 'Project not found'
+        message: 'Project record not found'
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Project deleted successfully'
+      message: 'Project record deleted successfully'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'Error deleting project',
+      message: 'Error deleting project record',
       error: error.message
     });
   }
@@ -321,5 +344,6 @@ export {
   getAllStudentProjects,
   getAdminStudentProjectById,
   updateAdminStudentProject,
-  deleteAdminStudentProject
+  deleteAdminStudentProject,
+  getPublicStudentProjects // Export the new function
 };
