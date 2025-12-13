@@ -26,6 +26,10 @@ const studentProjectSchema = new mongoose.Schema({
   category: {
     type: String,
     trim: true
+  },
+  imageUrl: {
+    type: String, // S3 URL for project image
+    trim: true
   }
 }, {
   timestamps: true

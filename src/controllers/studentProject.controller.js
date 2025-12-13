@@ -1,10 +1,56 @@
 import StudentProject from '../models/studentProject.model.js';
+import s3 from '../config/s3.js';
+import { v4 as uuidv4 } from 'uuid';
+import multer from 'multer';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+// Configure multer with memory storage
+const storage = multer.memoryStorage();
+export const upload = multer({ 
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
+
+// Upload image to AWS S3
+const uploadToS3 = async (file, folder) => {
+  const fileKey = `elite-cards/${folder}/${uuidv4()}-${Date.now()}-${file.originalname}`;
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: fileKey,
+    Body: file.buffer,
+    ContentType: file.mimetype,
+  };
+
+  const uploaded = await s3.upload(params).promise();
+  return uploaded.Location; // Return public URL
+};
+
+// Helper function to delete image from S3
+const deleteImageFromS3 = async (imageUrl) => {
+  if (!imageUrl) return;
+  
+  try {
+    // Extract key from URL
+    const urlParts = imageUrl.split('/');
+    const key = urlParts.slice(3).join('/'); // Remove https://bucket-name.s3.region.amazonaws.com/
+    
+    await s3.deleteObject({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: key
+    }).promise();
+  } catch (error) {
+    console.error('Error deleting image from S3:', error);
+  }
+};
 
 // Create student project
 const createStudentProject = async (req, res) => {
   try {
-    const { projectName, description, technologies, startDate, endDate, projectUrl, imageUrl } = req.body;
-
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
@@ -12,6 +58,15 @@ const createStudentProject = async (req, res) => {
         message: 'Only students can create project records'
       });
     }
+
+    let imageUrl = null;
+    
+    // Handle image upload if file is provided
+    if (req.file) {
+      imageUrl = await uploadToS3(req.file, 'student-projects');
+    }
+
+    const { projectName, description, technologies, startDate, endDate, projectUrl } = req.body;
 
     const project = new StudentProject({
       userId: req.user.id,
@@ -113,20 +168,35 @@ const updateStudentProject = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { projectName, description, technologies, startDate, endDate, projectUrl, imageUrl } = req.body;
-
-    const project = await StudentProject.findOneAndUpdate(
-      { _id: id, userId: req.user.id },
-      { projectName, description, technologies, startDate, endDate, projectUrl, imageUrl },
-      { new: true, runValidators: true }
-    );
-
-    if (!project) {
+    
+    // Check if project exists and belongs to user
+    const existingProject = await StudentProject.findOne({ _id: id, userId: req.user.id });
+    
+    if (!existingProject) {
       return res.status(404).json({
         success: false,
         message: 'Project record not found'
       });
     }
+
+    const { projectName, description, technologies, startDate, endDate, projectUrl } = req.body;
+
+    // Handle image update
+    let updateData = { projectName, description, technologies, startDate, endDate, projectUrl };
+    if (req.file) {
+      // Upload new image to S3
+      const imageUrl = await uploadToS3(req.file, 'student-projects');
+      // Delete old image from S3
+      await deleteImageFromS3(existingProject.imageUrl);
+      // Add new image URL to update data
+      updateData.imageUrl = imageUrl;
+    }
+
+    const project = await StudentProject.findOneAndUpdate(
+      { _id: id, userId: req.user.id },
+      updateData,
+      { new: true, runValidators: true }
+    );
 
     res.status(200).json({
       success: true,
@@ -271,20 +341,35 @@ const updateAdminStudentProject = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { projectName, description, technologies, startDate, endDate, projectUrl, imageUrl, userId } = req.body;
-
-    const project = await StudentProject.findByIdAndUpdate(
-      id,
-      { projectName, description, technologies, startDate, endDate, projectUrl, imageUrl, userId },
-      { new: true, runValidators: true }
-    ).populate('userId', 'email role');
-
-    if (!project) {
+    
+    // Check if project exists
+    const existingProject = await StudentProject.findById(id);
+    
+    if (!existingProject) {
       return res.status(404).json({
         success: false,
         message: 'Project record not found'
       });
     }
+
+    const { projectName, description, technologies, startDate, endDate, projectUrl, userId } = req.body;
+
+    // Handle image update
+    let updateData = { projectName, description, technologies, startDate, endDate, projectUrl, userId };
+    if (req.file) {
+      // Upload new image to S3
+      const imageUrl = await uploadToS3(req.file, 'student-projects');
+      // Delete old image from S3
+      await deleteImageFromS3(existingProject.imageUrl);
+      // Add new image URL to update data
+      updateData.imageUrl = imageUrl;
+    }
+
+    const project = await StudentProject.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    ).populate('userId', 'email role');
 
     res.status(200).json({
       success: true,

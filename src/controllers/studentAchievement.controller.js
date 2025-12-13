@@ -1,10 +1,56 @@
 import StudentAchievement from '../models/studentAchievement.model.js';
+import s3 from '../config/s3.js';
+import { v4 as uuidv4 } from 'uuid';
+import multer from 'multer';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+// Configure multer with memory storage
+const storage = multer.memoryStorage();
+export const upload = multer({ 
+  storage,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
+
+// Upload image to AWS S3
+const uploadToS3 = async (file, folder) => {
+  const fileKey = `elite-cards/${folder}/${uuidv4()}-${Date.now()}-${file.originalname}`;
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: fileKey,
+    Body: file.buffer,
+    ContentType: file.mimetype,
+  };
+
+  const uploaded = await s3.upload(params).promise();
+  return uploaded.Location; // Return public URL
+};
+
+// Helper function to delete image from S3
+const deleteImageFromS3 = async (imageUrl) => {
+  if (!imageUrl) return;
+  
+  try {
+    // Extract key from URL
+    const urlParts = imageUrl.split('/');
+    const key = urlParts.slice(3).join('/'); // Remove https://bucket-name.s3.region.amazonaws.com/
+    
+    await s3.deleteObject({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: key
+    }).promise();
+  } catch (error) {
+    console.error('Error deleting image from S3:', error);
+  }
+};
 
 // Create student achievement
 const createStudentAchievement = async (req, res) => {
   try {
-    const { title, issuer, date, description, certificateUrl } = req.body;
-
     // Check if user has student role
     if (req.user.role !== 'student') {
       return res.status(403).json({
@@ -12,6 +58,15 @@ const createStudentAchievement = async (req, res) => {
         message: 'Only students can create achievement records'
       });
     }
+
+    let certificateUrl = null;
+    
+    // Handle certificate image upload if file is provided
+    if (req.file) {
+      certificateUrl = await uploadToS3(req.file, 'student-achievements');
+    }
+
+    const { title, issuer, date, description } = req.body;
 
     const achievement = new StudentAchievement({
       userId: req.user.id,
@@ -111,20 +166,35 @@ const updateStudentAchievement = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { title, issuer, date, description, certificateUrl } = req.body;
-
-    const achievement = await StudentAchievement.findOneAndUpdate(
-      { _id: id, userId: req.user.id },
-      { title, issuer, date, description, certificateUrl },
-      { new: true, runValidators: true }
-    );
-
-    if (!achievement) {
+    
+    // Check if achievement exists and belongs to user
+    const existingAchievement = await StudentAchievement.findOne({ _id: id, userId: req.user.id });
+    
+    if (!existingAchievement) {
       return res.status(404).json({
         success: false,
         message: 'Achievement record not found'
       });
     }
+
+    const { title, issuer, date, description } = req.body;
+
+    // Handle certificate image update
+    let updateData = { title, issuer, date, description };
+    if (req.file) {
+      // Upload new certificate image to S3
+      const certificateUrl = await uploadToS3(req.file, 'student-achievements');
+      // Delete old certificate image from S3
+      await deleteImageFromS3(existingAchievement.certificateUrl);
+      // Add new certificate URL to update data
+      updateData.certificateUrl = certificateUrl;
+    }
+
+    const achievement = await StudentAchievement.findOneAndUpdate(
+      { _id: id, userId: req.user.id },
+      updateData,
+      { new: true, runValidators: true }
+    );
 
     res.status(200).json({
       success: true,
@@ -269,20 +339,35 @@ const updateAdminStudentAchievement = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { title, issuer, date, description, certificateUrl, userId } = req.body;
-
-    const achievement = await StudentAchievement.findByIdAndUpdate(
-      id,
-      { title, issuer, date, description, certificateUrl, userId },
-      { new: true, runValidators: true }
-    ).populate('userId', 'email role');
-
-    if (!achievement) {
+    
+    // Check if achievement exists
+    const existingAchievement = await StudentAchievement.findById(id);
+    
+    if (!existingAchievement) {
       return res.status(404).json({
         success: false,
         message: 'Achievement record not found'
       });
     }
+
+    const { title, issuer, date, description, userId } = req.body;
+
+    // Handle certificate image update
+    let updateData = { title, issuer, date, description, userId };
+    if (req.file) {
+      // Upload new certificate image to S3
+      const certificateUrl = await uploadToS3(req.file, 'student-achievements');
+      // Delete old certificate image from S3
+      await deleteImageFromS3(existingAchievement.certificateUrl);
+      // Add new certificate URL to update data
+      updateData.certificateUrl = certificateUrl;
+    }
+
+    const achievement = await StudentAchievement.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    ).populate('userId', 'email role');
 
     res.status(200).json({
       success: true,

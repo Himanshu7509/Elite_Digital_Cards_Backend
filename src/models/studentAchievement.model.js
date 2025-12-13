@@ -17,6 +17,10 @@ const studentAchievementSchema = new mongoose.Schema({
   },
   date: {
     type: Date
+  },
+  certificateUrl: {
+    type: String, // S3 URL for achievement certificate image
+    trim: true
   }
 }, {
   timestamps: true

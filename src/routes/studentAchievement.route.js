@@ -9,17 +9,18 @@ import {
   getAdminStudentAchievementById,
   updateAdminStudentAchievement,
   deleteAdminStudentAchievement,
-  getPublicStudentAchievements // Add this import
+  getPublicStudentAchievements, // Add this import
+  upload
 } from '../controllers/studentAchievement.controller.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.middleware.js';
 
 const router = express.Router();
 
 // Student routes (protected)
-router.post('/', authMiddleware, createStudentAchievement);
+router.post('/', authMiddleware, upload.single('certificateImage'), createStudentAchievement);
 router.get('/my', authMiddleware, getMyStudentAchievements);
 router.get('/:id', authMiddleware, getStudentAchievementById);
-router.put('/:id', authMiddleware, updateStudentAchievement);
+router.put('/:id', authMiddleware, upload.single('certificateImage'), updateStudentAchievement);
 router.delete('/:id', authMiddleware, deleteStudentAchievement);
 
 // Public route (no authentication required)
@@ -28,7 +29,7 @@ router.get('/public/:userId', getPublicStudentAchievements); // Add this route
 // Admin routes (protected + admin authorization)
 router.get('/', authMiddleware, adminAuth, getAllStudentAchievements);
 router.get('/:id/admin', authMiddleware, adminAuth, getAdminStudentAchievementById);
-router.put('/:id/admin', authMiddleware, adminAuth, updateAdminStudentAchievement);
+router.put('/:id/admin', authMiddleware, adminAuth, upload.single('certificateImage'), updateAdminStudentAchievement);
 router.delete('/:id/admin', authMiddleware, adminAuth, deleteAdminStudentAchievement);
 
 export default router;
