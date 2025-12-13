@@ -9,6 +9,7 @@ import {
   getAdminStudentAchievementById,
   updateAdminStudentAchievement,
   deleteAdminStudentAchievement,
+  createAdminStudentAchievement,
   getPublicStudentAchievements, // Add this import
   upload
 } from '../controllers/studentAchievement.controller.js';
@@ -29,6 +30,7 @@ router.get('/public/:userId', getPublicStudentAchievements); // Add this route
 // Admin routes (protected + admin authorization)
 router.get('/', authMiddleware, adminAuth, getAllStudentAchievements);
 router.get('/:id/admin', authMiddleware, adminAuth, getAdminStudentAchievementById);
+router.post('/admin/create', authMiddleware, adminAuth, upload.single('certificateImage'), createAdminStudentAchievement);
 router.put('/:id/admin', authMiddleware, adminAuth, upload.single('certificateImage'), updateAdminStudentAchievement);
 router.delete('/:id/admin', authMiddleware, adminAuth, deleteAdminStudentAchievement);
 

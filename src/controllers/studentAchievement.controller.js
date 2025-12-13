@@ -418,6 +418,50 @@ const deleteAdminStudentAchievement = async (req, res) => {
   }
 };
 
+// Admin: Create student achievement
+const createAdminStudentAchievement = async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can create achievement records'
+      });
+    }
+
+    let certificateUrl = null;
+    
+    // Handle certificate upload if file is provided
+    if (req.file) {
+      certificateUrl = await uploadToS3(req.file, 'student-achievements');
+    }
+
+    const { title, description, date, userId } = req.body;
+
+    const achievement = new StudentAchievement({
+      userId,
+      title,
+      description,
+      date,
+      certificateUrl
+    });
+
+    await achievement.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Achievement record created successfully',
+      data: achievement
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error creating achievement record',
+      error: error.message
+    });
+  }
+};
+
 export {
   createStudentAchievement,
   getMyStudentAchievements,
@@ -428,5 +472,6 @@ export {
   getAdminStudentAchievementById,
   updateAdminStudentAchievement,
   deleteAdminStudentAchievement,
+  createAdminStudentAchievement,
   getPublicStudentAchievements // Export the new function
 };

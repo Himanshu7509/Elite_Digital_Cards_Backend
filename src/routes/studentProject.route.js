@@ -9,7 +9,8 @@ import {
   getAdminStudentProjectById,
   updateAdminStudentProject,
   deleteAdminStudentProject,
-  getPublicStudentProjects, // Add this import
+  getPublicStudentProjects,
+  createAdminStudentProject, // Add this import
   upload
 } from '../controllers/studentProject.controller.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.middleware.js';
@@ -29,6 +30,7 @@ router.get('/public/:userId', getPublicStudentProjects); // Add this route
 // Admin routes (protected + admin authorization)
 router.get('/', authMiddleware, adminAuth, getAllStudentProjects);
 router.get('/:id/admin', authMiddleware, adminAuth, getAdminStudentProjectById);
+router.post('/admin/create', authMiddleware, adminAuth, upload.single('projectImage'), createAdminStudentProject);
 router.put('/:id/admin', authMiddleware, adminAuth, upload.single('projectImage'), updateAdminStudentProject);
 router.delete('/:id/admin', authMiddleware, adminAuth, deleteAdminStudentProject);
 

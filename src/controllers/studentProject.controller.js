@@ -72,7 +72,7 @@ const createStudentProject = async (req, res) => {
       userId: req.user.id,
       projectName,
       description,
-      technologies,
+      technologies: technologies || [],
       startDate,
       endDate,
       projectUrl,
@@ -182,7 +182,7 @@ const updateStudentProject = async (req, res) => {
     const { projectName, description, technologies, startDate, endDate, projectUrl } = req.body;
 
     // Handle image update
-    let updateData = { projectName, description, technologies, startDate, endDate, projectUrl };
+    let updateData = { projectName, description, technologies: technologies || [], startDate, endDate, projectUrl };
     if (req.file) {
       // Upload new image to S3
       const imageUrl = await uploadToS3(req.file, 'student-projects');
@@ -355,7 +355,7 @@ const updateAdminStudentProject = async (req, res) => {
     const { projectName, description, technologies, startDate, endDate, projectUrl, userId } = req.body;
 
     // Handle image update
-    let updateData = { projectName, description, technologies, startDate, endDate, projectUrl, userId };
+    let updateData = { projectName, description, technologies: technologies || [], startDate, endDate, projectUrl, userId };
     if (req.file) {
       // Upload new image to S3
       const imageUrl = await uploadToS3(req.file, 'student-projects');
@@ -380,6 +380,53 @@ const updateAdminStudentProject = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error updating project record',
+      error: error.message
+    });
+  }
+};
+
+// Admin: Create student project
+const createAdminStudentProject = async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can create project records'
+      });
+    }
+
+    let imageUrl = null;
+    
+    // Handle image upload if file is provided
+    if (req.file) {
+      imageUrl = await uploadToS3(req.file, 'student-projects');
+    }
+
+    const { projectName, description, technologies, startDate, endDate, projectUrl, userId } = req.body;
+
+    const project = new StudentProject({
+      userId,
+      projectName,
+      description,
+      technologies: technologies || [],
+      startDate,
+      endDate,
+      projectUrl,
+      imageUrl
+    });
+
+    await project.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Project record created successfully',
+      data: project
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error creating project record',
       error: error.message
     });
   }
@@ -430,5 +477,6 @@ export {
   getAdminStudentProjectById,
   updateAdminStudentProject,
   deleteAdminStudentProject,
+  createAdminStudentProject,
   getPublicStudentProjects // Export the new function
 };
