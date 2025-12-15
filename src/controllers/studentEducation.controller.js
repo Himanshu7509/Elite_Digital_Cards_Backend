@@ -335,6 +335,44 @@ const deleteAdminStudentEducation = async (req, res) => {
   }
 };
 
+// Admin: Create student education
+const createAdminStudentEducation = async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can create education records'
+      });
+    }
+
+    const { degree, institution, startDate, endDate, description, userId } = req.body;
+
+    const education = new StudentEducation({
+      userId,
+      degree,
+      institution,
+      startDate,
+      endDate,
+      description
+    });
+
+    await education.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Education record created successfully',
+      data: education
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error creating education record',
+      error: error.message
+    });
+  }
+};
+
 export {
   createStudentEducation,
   getMyStudentEducations,
@@ -345,5 +383,6 @@ export {
   getAdminStudentEducationById,
   updateAdminStudentEducation,
   deleteAdminStudentEducation,
+  createAdminStudentEducation,
   getPublicStudentEducations // Export the new function
 };

@@ -330,6 +330,41 @@ const deleteAdminStudentSkill = async (req, res) => {
   }
 };
 
+// Admin: Create student skill
+const createAdminStudentSkill = async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can create skills'
+      });
+    }
+
+    const { name, level, userId } = req.body;
+
+    const skill = new StudentSkill({
+      userId,
+      name,
+      level
+    });
+
+    await skill.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Skill created successfully',
+      data: skill
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error creating skill',
+      error: error.message
+    });
+  }
+};
+
 export {
   createStudentSkill,
   getMyStudentSkills,
@@ -340,5 +375,6 @@ export {
   getAdminStudentSkillById,
   updateAdminStudentSkill,
   deleteAdminStudentSkill,
+  createAdminStudentSkill,
   getPublicStudentSkills // Export the new function
 };

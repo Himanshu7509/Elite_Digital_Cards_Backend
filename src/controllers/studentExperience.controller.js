@@ -333,6 +333,44 @@ const deleteAdminStudentExperience = async (req, res) => {
   }
 };
 
+// Admin: Create student experience
+const createAdminStudentExperience = async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only admins can create experience records'
+      });
+    }
+
+    const { companyName, position, startDate, endDate, description, userId } = req.body;
+
+    const experience = new StudentExperience({
+      userId,
+      companyName,
+      position,
+      startDate,
+      endDate,
+      description
+    });
+
+    await experience.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Experience record created successfully',
+      data: experience
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error creating experience record',
+      error: error.message
+    });
+  }
+};
+
 export {
   createStudentExperience,
   getMyStudentExperiences,
@@ -343,5 +381,6 @@ export {
   getAdminStudentExperienceById,
   updateAdminStudentExperience,
   deleteAdminStudentExperience,
+  createAdminStudentExperience,
   getPublicStudentExperiences // Export the new function
 };

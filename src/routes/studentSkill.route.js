@@ -9,6 +9,7 @@ import {
   getAdminStudentSkillById,
   updateAdminStudentSkill,
   deleteAdminStudentSkill,
+  createAdminStudentSkill,
   getPublicStudentSkills // Add this import
 } from '../controllers/studentSkill.controller.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.middleware.js';
@@ -28,6 +29,7 @@ router.get('/public/:userId', getPublicStudentSkills); // Add this route
 // Admin routes (protected + admin authorization)
 router.get('/', authMiddleware, adminAuth, getAllStudentSkills);
 router.get('/:id/admin', authMiddleware, adminAuth, getAdminStudentSkillById);
+router.post('/admin/create', authMiddleware, adminAuth, createAdminStudentSkill);
 router.put('/:id/admin', authMiddleware, adminAuth, updateAdminStudentSkill);
 router.delete('/:id/admin', authMiddleware, adminAuth, deleteAdminStudentSkill);
 

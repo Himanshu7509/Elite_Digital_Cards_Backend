@@ -9,6 +9,7 @@ import {
   getAdminStudentEducationById,
   updateAdminStudentEducation,
   deleteAdminStudentEducation,
+  createAdminStudentEducation,
   getPublicStudentEducations // Add this import
 } from '../controllers/studentEducation.controller.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.middleware.js';
@@ -28,6 +29,7 @@ router.get('/public/:userId', getPublicStudentEducations); // Add this route
 // Admin routes (protected + admin authorization)
 router.get('/', authMiddleware, adminAuth, getAllStudentEducations);
 router.get('/:id/admin', authMiddleware, adminAuth, getAdminStudentEducationById);
+router.post('/admin/create', authMiddleware, adminAuth, createAdminStudentEducation);
 router.put('/:id/admin', authMiddleware, adminAuth, updateAdminStudentEducation);
 router.delete('/:id/admin', authMiddleware, adminAuth, deleteAdminStudentEducation);
 

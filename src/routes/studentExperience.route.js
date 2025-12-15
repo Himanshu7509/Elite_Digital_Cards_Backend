@@ -9,6 +9,7 @@ import {
   getAdminStudentExperienceById,
   updateAdminStudentExperience,
   deleteAdminStudentExperience,
+  createAdminStudentExperience,
   getPublicStudentExperiences // Add this import
 } from '../controllers/studentExperience.controller.js';
 import { authMiddleware, adminAuth } from '../middleware/auth.middleware.js';
@@ -28,6 +29,7 @@ router.get('/public/:userId', getPublicStudentExperiences); // Add this route
 // Admin routes (protected + admin authorization)
 router.get('/', authMiddleware, adminAuth, getAllStudentExperiences);
 router.get('/:id/admin', authMiddleware, adminAuth, getAdminStudentExperienceById);
+router.post('/admin/create', authMiddleware, adminAuth, createAdminStudentExperience);
 router.put('/:id/admin', authMiddleware, adminAuth, updateAdminStudentExperience);
 router.delete('/:id/admin', authMiddleware, adminAuth, deleteAdminStudentExperience);
 
