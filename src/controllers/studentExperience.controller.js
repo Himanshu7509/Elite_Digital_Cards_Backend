@@ -3,7 +3,7 @@ import StudentExperience from '../models/studentExperience.model.js';
 // Create student experience
 const createStudentExperience = async (req, res) => {
   try {
-    const { companyName, position, startDate, endDate, description } = req.body;
+    const { company, role, startDate, endDate, desc, duration } = req.body;
 
     // Check if user has student role
     if (req.user.role !== 'student') {
@@ -15,11 +15,12 @@ const createStudentExperience = async (req, res) => {
 
     const experience = new StudentExperience({
       userId: req.user.id,
-      companyName,
-      position,
+      company,
+      role,
       startDate,
       endDate,
-      description
+      desc,
+      duration
     });
 
     await experience.save();
@@ -111,11 +112,11 @@ const updateStudentExperience = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { companyName, position, startDate, endDate, description } = req.body;
+    const { company, role, startDate, endDate, desc, duration } = req.body;
 
     const experience = await StudentExperience.findOneAndUpdate(
       { _id: id, userId: req.user.id },
-      { companyName, position, startDate, endDate, description },
+      { company, role, startDate, endDate, desc, duration },
       { new: true, runValidators: true }
     );
 
@@ -269,11 +270,11 @@ const updateAdminStudentExperience = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { companyName, position, startDate, endDate, description, userId } = req.body;
+    const { company, role, startDate, endDate, desc, duration, userId } = req.body;
 
     const experience = await StudentExperience.findByIdAndUpdate(
       id,
-      { companyName, position, startDate, endDate, description, userId },
+      { company, role, startDate, endDate, desc, duration, userId },
       { new: true, runValidators: true }
     ).populate('userId', 'email role');
 
@@ -344,18 +345,42 @@ const createAdminStudentExperience = async (req, res) => {
       });
     }
 
-    const { companyName, position, startDate, endDate, description, userId } = req.body;
+    // Debug log - log the entire request body
+    console.log('Full request body:', req.body);
+    
+    const { company, role, startDate, endDate, desc, duration, userId } = req.body;
+    
+    // Debug log - log individual fields
+    console.log('Extracted fields:', { company, role, startDate, endDate, desc, duration, userId });
 
     const experience = new StudentExperience({
       userId,
-      companyName,
-      position,
+      company,
+      role,
       startDate,
       endDate,
-      description
+      desc,
+      duration
     });
+    
+    // Debug log - log the experience object before save
+    console.log('Experience object before save:', JSON.stringify(experience, null, 2));
+    
+    // Validate the experience object
+    const validationError = experience.validateSync();
+    if (validationError) {
+      console.log('Validation error:', validationError);
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        error: validationError.message
+      });
+    }
 
     await experience.save();
+    
+    // Debug log - log the experience object after save
+    console.log('Experience object after save:', JSON.stringify(experience, null, 2));
 
     res.status(201).json({
       success: true,
@@ -363,6 +388,7 @@ const createAdminStudentExperience = async (req, res) => {
       data: experience
     });
   } catch (error) {
+    console.error('Error in createAdminStudentExperience:', error);
     res.status(500).json({
       success: false,
       message: 'Error creating experience record',

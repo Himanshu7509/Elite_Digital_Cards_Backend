@@ -3,7 +3,7 @@ import StudentEducation from '../models/studentEducation.model.js';
 // Create student education
 const createStudentEducation = async (req, res) => {
   try {
-    const { institutionName, degree, fieldOfStudy, startDate, endDate, grade, description } = req.body;
+    const { school, degree, major, year, gpa } = req.body;
 
     // Check if user has student role
     if (req.user.role !== 'student') {
@@ -15,13 +15,11 @@ const createStudentEducation = async (req, res) => {
 
     const education = new StudentEducation({
       userId: req.user.id,
-      institutionName,
+      school,
       degree,
-      fieldOfStudy,
-      startDate,
-      endDate,
-      grade,
-      description
+      major,
+      year,
+      gpa
     });
 
     await education.save();
@@ -113,11 +111,11 @@ const updateStudentEducation = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { institutionName, degree, fieldOfStudy, startDate, endDate, grade, description } = req.body;
+    const { school, degree, major, year, gpa } = req.body;
 
     const education = await StudentEducation.findOneAndUpdate(
       { _id: id, userId: req.user.id },
-      { institutionName, degree, fieldOfStudy, startDate, endDate, grade, description },
+      { school, degree, major, year, gpa },
       { new: true, runValidators: true }
     );
 
@@ -271,11 +269,11 @@ const updateAdminStudentEducation = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { institutionName, degree, fieldOfStudy, startDate, endDate, grade, description, userId } = req.body;
+    const { school, degree, major, year, gpa, userId } = req.body;
 
     const education = await StudentEducation.findByIdAndUpdate(
       id,
-      { institutionName, degree, fieldOfStudy, startDate, endDate, grade, description, userId },
+      { school, degree, major, year, gpa, userId },
       { new: true, runValidators: true }
     ).populate('userId', 'email role');
 
@@ -346,15 +344,15 @@ const createAdminStudentEducation = async (req, res) => {
       });
     }
 
-    const { degree, institution, startDate, endDate, description, userId } = req.body;
+    const { school, degree, major, year, gpa, userId } = req.body;
 
     const education = new StudentEducation({
       userId,
+      school,
       degree,
-      institution,
-      startDate,
-      endDate,
-      description
+      major,
+      year,
+      gpa
     });
 
     await education.save();
