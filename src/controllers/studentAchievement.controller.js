@@ -78,16 +78,10 @@ const createStudentAchievement = async (req, res) => {
 
     await achievement.save();
 
-    // Transform the data to match frontend expectations
-    const transformedAchievement = {
-      ...achievement.toObject(),
-      description: achievement.desc
-    };
-
     res.status(201).json({
       success: true,
       message: 'Achievement record created successfully',
-      data: transformedAchievement
+      data: achievement
     });
   } catch (error) {
     res.status(500).json({
@@ -111,15 +105,9 @@ const getMyStudentAchievements = async (req, res) => {
 
     const achievements = await StudentAchievement.find({ userId: req.user.id });
     
-    // Transform the data to match frontend expectations
-    const transformedAchievements = achievements.map(achievement => ({
-      ...achievement.toObject(),
-      description: achievement.desc
-    }));
-    
     res.status(200).json({
       success: true,
-      data: transformedAchievements
+      data: achievements
     });
   } catch (error) {
     res.status(500).json({
@@ -152,15 +140,9 @@ const getStudentAchievementById = async (req, res) => {
       });
     }
 
-    // Transform the data to match frontend expectations
-    const transformedAchievement = {
-      ...achievement.toObject(),
-      description: achievement.desc
-    };
-
     res.status(200).json({
       success: true,
-      data: transformedAchievement
+      data: achievement
     });
   } catch (error) {
     res.status(500).json({
@@ -213,16 +195,10 @@ const updateStudentAchievement = async (req, res) => {
       { new: true, runValidators: true }
     );
 
-    // Transform the data to match frontend expectations
-    const transformedAchievement = {
-      ...achievement.toObject(),
-      description: achievement.desc
-    };
-
     res.status(200).json({
       success: true,
       message: 'Achievement record updated successfully',
-      data: transformedAchievement
+      data: achievement
     });
   } catch (error) {
     res.status(500).json({
@@ -276,15 +252,9 @@ const getPublicStudentAchievements = async (req, res) => {
     // Find all achievements for the specified user ID
     const achievements = await StudentAchievement.find({ userId: userId });
     
-    // Transform the data to match frontend expectations
-    const transformedAchievements = achievements.map(achievement => ({
-      ...achievement.toObject(),
-      description: achievement.desc
-    }));
-    
     res.status(200).json({
       success: true,
-      data: transformedAchievements
+      data: achievements
     });
   } catch (error) {
     res.status(500).json({
@@ -398,16 +368,10 @@ const updateAdminStudentAchievement = async (req, res) => {
       { new: true, runValidators: true }
     ).populate('userId', 'email role');
 
-    // Transform the data to match frontend expectations
-    const transformedAchievement = {
-      ...achievement.toObject(),
-      description: achievement.desc
-    };
-
     res.status(200).json({
       success: true,
       message: 'Achievement record updated successfully',
-      data: transformedAchievement
+      data: achievement
     });
   } catch (error) {
     res.status(500).json({
@@ -483,16 +447,10 @@ const createAdminStudentAchievement = async (req, res) => {
 
     await achievement.save();
 
-    // Transform the data to match frontend expectations
-    const transformedAchievement = {
-      ...achievement.toObject(),
-      description: achievement.desc
-    };
-
     res.status(201).json({
       success: true,
       message: 'Achievement record created successfully',
-      data: transformedAchievement
+      data: achievement
     });
   } catch (error) {
     res.status(500).json({

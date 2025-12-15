@@ -107,18 +107,9 @@ const getMyStudentProjects = async (req, res) => {
 
     const projects = await StudentProject.find({ userId: req.user.id });
     
-    // Transform the data to match frontend expectations
-    const transformedProjects = projects.map(project => ({
-      ...project.toObject(),
-      projectName: project.title,
-      description: project.desc,
-      technologies: project.tech,
-      projectUrl: project.link
-    }));
-    
     res.status(200).json({
       success: true,
-      data: transformedProjects
+      data: projects
     });
   } catch (error) {
     res.status(500).json({
@@ -151,18 +142,9 @@ const getStudentProjectById = async (req, res) => {
       });
     }
 
-    // Transform the data to match frontend expectations
-    const transformedProject = {
-      ...project.toObject(),
-      projectName: project.title,
-      description: project.desc,
-      technologies: project.tech,
-      projectUrl: project.link
-    };
-
     res.status(200).json({
       success: true,
-      data: transformedProject
+      data: project
     });
   } catch (error) {
     res.status(500).json({
@@ -220,19 +202,10 @@ const updateStudentProject = async (req, res) => {
       { new: true, runValidators: true }
     );
 
-    // Transform the data to match frontend expectations
-    const transformedProject = {
-      ...project.toObject(),
-      projectName: project.title,
-      description: project.desc,
-      technologies: project.tech,
-      projectUrl: project.link
-    };
-
     res.status(200).json({
       success: true,
       message: 'Project record updated successfully',
-      data: transformedProject
+      data: project
     });
   } catch (error) {
     res.status(500).json({
@@ -286,18 +259,9 @@ const getPublicStudentProjects = async (req, res) => {
     // Find all projects for the specified user ID
     const projects = await StudentProject.find({ userId: userId });
     
-    // Transform the data to match frontend expectations
-    const transformedProjects = projects.map(project => ({
-      ...project.toObject(),
-      projectName: project.title,
-      description: project.desc,
-      technologies: project.tech,
-      projectUrl: project.link
-    }));
-    
     res.status(200).json({
       success: true,
-      data: transformedProjects
+      data: projects
     });
   } catch (error) {
     res.status(500).json({
@@ -417,19 +381,10 @@ const updateAdminStudentProject = async (req, res) => {
       { new: true, runValidators: true }
     ).populate('userId', 'email role');
 
-    // Transform the data to match frontend expectations
-    const transformedProject = {
-      ...project.toObject(),
-      projectName: project.title,
-      description: project.desc,
-      technologies: project.tech,
-      projectUrl: project.link
-    };
-
     res.status(200).json({
       success: true,
       message: 'Project record updated successfully',
-      data: transformedProject
+      data: project
     });
   } catch (error) {
     res.status(500).json({
@@ -472,19 +427,10 @@ const createAdminStudentProject = async (req, res) => {
 
     await project.save();
 
-    // Transform the data to match frontend expectations
-    const transformedProject = {
-      ...project.toObject(),
-      projectName: project.title,
-      description: project.desc,
-      technologies: project.tech,
-      projectUrl: project.link
-    };
-
     res.status(201).json({
       success: true,
       message: 'Project record created successfully',
-      data: transformedProject
+      data: project
     });
   } catch (error) {
     res.status(500).json({
