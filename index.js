@@ -41,7 +41,8 @@ const allowedOrigins = [
   'https://elitedigitalcards.com',
   'https://www.elitedigitalcards.in',
   'https://elitedigitalcards.in',
-  'https://elite-cards-admin-panel.vercel.app'
+  'https://admin.elitedigitalcards.com',
+  'https://patil-associates-admin-panel.vercel.app'
 ];
 // Middleware
 app.use(
