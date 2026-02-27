@@ -575,6 +575,608 @@ A comprehensive backend API for digital business cards with authentication, prof
   }
   ```
 
+## Student Profiles
+
+### Create Student Profile
+- **URL**: `POST /api/student-profiles/`
+- **Headers**: `Authorization: Bearer <token>`
+- **Body**:
+  ```json
+  {
+    "fullName": "John Doe",
+    "email": "john.doe@example.com",
+    "about": "About me section",
+    "phone1": "+1234567890",
+    "phone2": "+0987654321",
+    "location": "New York, USA",
+    "dob": "1990-01-01",
+    "socialMedia": {
+      "facebook": "https://facebook.com/johndoe",
+      "instagram": "https://instagram.com/johndoe",
+      "twitter": "https://twitter.com/johndoe",
+      "linkedin": "https://linkedin.com/in/johndoe",
+      "youtube": "https://youtube.com/johndoe",
+      "whatsapp": "+1234567890"
+    },
+    "templateId": "template1"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Student profile created successfully",
+    "data": {
+      "_id": "profile_id",
+      "userId": "user_id",
+      "fullName": "John Doe",
+      "email": "john.doe@example.com",
+      "about": "About me section",
+      "phone1": "+1234567890",
+      "phone2": "+0987654321",
+      "location": "New York, USA",
+      "dob": "1990-01-01T00:00:00.000Z",
+      "socialMedia": {},
+      "templateId": "template1",
+      "createdAt": "2023-01-01T00:00:00.000Z",
+      "updatedAt": "2023-01-01T00:00:00.000Z"
+    }
+  }
+  ```
+
+### Upload Student Profile Picture
+- **URL**: `POST /api/student-profiles/upload/profile-pic`
+- **Headers**: `Authorization: Bearer <token>`
+- **Form Data**: `profilePic` (file)
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Profile picture uploaded successfully",
+    "data": {
+      "profilePic": "https://bucket.s3.region.amazonaws.com/elite-cards/studentProfilePic/image.jpg"
+    }
+  }
+  ```
+
+### Upload Student Banner Picture
+- **URL**: `POST /api/student-profiles/upload/banner-pic`
+- **Headers**: `Authorization: Bearer <token>`
+- **Form Data**: `bannerPic` (file)
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Banner picture uploaded successfully",
+    "data": {
+      "bannerPic": "https://bucket.s3.region.amazonaws.com/elite-cards/studentBannerPic/image.jpg"
+    }
+  }
+  ```
+
+### Update Student Profile Picture
+- **URL**: `PUT /api/student-profiles/upload/profile-pic`
+- **Headers**: `Authorization: Bearer <token>`
+- **Form Data**: `profilePic` (file)
+
+### Update Student Banner Picture
+- **URL**: `PUT /api/student-profiles/upload/banner-pic`
+- **Headers**: `Authorization: Bearer <token>`
+- **Form Data**: `bannerPic` (file)
+
+### Get My Student Profile
+- **URL**: `GET /api/student-profiles/me`
+- **Headers**: `Authorization: Bearer <token>`
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "_id": "profile_id",
+      "userId": "user_id",
+      "fullName": "John Doe",
+      "email": "john.doe@example.com",
+      "about": "About me section",
+      "phone1": "+1234567890",
+      "phone2": "+0987654321",
+      "location": "New York, USA",
+      "dob": "1990-01-01T00:00:00.000Z",
+      "socialMedia": {},
+      "templateId": "template1",
+      "profilePic": "https://bucket.s3.region.amazonaws.com/elite-cards/studentProfilePic/image.jpg",
+      "bannerPic": "https://bucket.s3.region.amazonaws.com/elite-cards/studentBannerPic/image.jpg",
+      "createdAt": "2023-01-01T00:00:00.000Z",
+      "updatedAt": "2023-01-01T00:00:00.000Z"
+    }
+  }
+  ```
+
+### Update My Student Profile
+- **URL**: `PUT /api/student-profiles/me`
+- **Headers**: `Authorization: Bearer <token>`
+- **Body**:
+  ```json
+  {
+    "fullName": "John Doe Updated",
+    "email": "john.updated@example.com",
+    "about": "Updated about me section",
+    "phone1": "+1234567890",
+    "phone2": "+0987654321",
+    "location": "San Francisco, USA",
+    "dob": "1990-01-01",
+    "socialMedia": {
+      "facebook": "https://facebook.com/johndoe",
+      "instagram": "https://instagram.com/johndoe",
+      "twitter": "https://twitter.com/johndoe",
+      "linkedin": "https://linkedin.com/in/johndoe",
+      "youtube": "https://youtube.com/johndoe",
+      "whatsapp": "+1234567890"
+    },
+    "templateId": "template2"
+  }
+  ```
+
+### Delete My Student Profile
+- **URL**: `DELETE /api/student-profiles/me`
+- **Headers**: `Authorization: Bearer <token>`
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Student profile deleted successfully"
+  }
+  ```
+
+### Get Public Student Profile
+- **URL**: `GET /api/student-profiles/public/:userId`
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "data": {
+      "fullName": "John Doe",
+      "email": "john.doe@example.com",
+      "about": "About me section",
+      "phone1": "+1234567890",
+      "phone2": "+0987654321",
+      "location": "New York, USA",
+      "dob": "1990-01-01T00:00:00.000Z",
+      "socialMedia": {},
+      "templateId": "template1",
+      "profilePic": "https://bucket.s3.region.amazonaws.com/elite-cards/studentProfilePic/image.jpg",
+      "bannerPic": "https://bucket.s3.region.amazonaws.com/elite-cards/studentBannerPic/image.jpg",
+      "createdAt": "2023-01-01T00:00:00.000Z",
+      "updatedAt": "2023-01-01T00:00:00.000Z"
+    }
+  }
+  ```
+
+## Student Achievements
+
+### Create Student Achievement
+- **URL**: `POST /api/student-achievements/`
+- **Headers**: `Authorization: Bearer <token>`
+- **Form Data**:
+  - `certificateImage` (file, optional)
+  - `title` (text)
+  - `date` (text)
+  - `description` (text)
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Achievement record created successfully",
+    "data": {
+      "_id": "achievement_id",
+      "userId": "user_id",
+      "title": "Best Student Award",
+      "desc": "Outstanding academic performance",
+      "date": "2023-06-15",
+      "certificateUrl": "https://bucket.s3.region.amazonaws.com/elite-cards/student-achievements/certificate.jpg",
+      "createdAt": "2023-01-01T00:00:00.000Z",
+      "updatedAt": "2023-01-01T00:00:00.000Z"
+    }
+  }
+  ```
+
+### Get My Student Achievements
+- **URL**: `GET /api/student-achievements/my`
+- **Headers**: `Authorization: Bearer <token>`
+
+### Get Student Achievement by ID
+- **URL**: `GET /api/student-achievements/:id`
+- **Headers**: `Authorization: Bearer <token>`
+
+### Update Student Achievement
+- **URL**: `PUT /api/student-achievements/:id`
+- **Headers**: `Authorization: Bearer <token>`
+- **Form Data** (optional image update):
+  - `certificateImage` (file, optional)
+  - `title` (text)
+  - `date` (text)
+  - `description` (text)
+
+### Delete Student Achievement
+- **URL**: `DELETE /api/student-achievements/:id`
+- **Headers**: `Authorization: Bearer <token>`
+
+### Get Public Student Achievements
+- **URL**: `GET /api/student-achievements/public/:userId`
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "_id": "achievement_id",
+        "userId": "user_id",
+        "title": "Best Student Award",
+        "desc": "Outstanding academic performance",
+        "date": "2023-06-15",
+        "certificateUrl": "https://bucket.s3.region.amazonaws.com/elite-cards/student-achievements/certificate.jpg",
+        "createdAt": "2023-01-01T00:00:00.000Z",
+        "updatedAt": "2023-01-01T00:00:00.000Z"
+      }
+    ]
+  }
+  ```
+
+## Student Education
+
+### Create Student Education
+- **URL**: `POST /api/student-educations/`
+- **Headers**: `Authorization: Bearer <token>`
+- **Body**:
+  ```json
+  {
+    "school": "Stanford University",
+    "degree": "Bachelor's Degree",
+    "major": "Computer Science",
+    "year": "2020-2024",
+    "gpa": "3.8"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Education record created successfully",
+    "data": {
+      "_id": "education_id",
+      "userId": "user_id",
+      "school": "Stanford University",
+      "degree": "Bachelor's Degree",
+      "major": "Computer Science",
+      "year": "2020-2024",
+      "gpa": "3.8",
+      "createdAt": "2023-01-01T00:00:00.000Z",
+      "updatedAt": "2023-01-01T00:00:00.000Z"
+    }
+  }
+  ```
+
+### Get My Student Educations
+- **URL**: `GET /api/student-educations/my`
+- **Headers**: `Authorization: Bearer <token>`
+
+### Get Student Education by ID
+- **URL**: `GET /api/student-educations/:id`
+- **Headers**: `Authorization: Bearer <token>`
+
+### Update Student Education
+- **URL**: `PUT /api/student-educations/:id`
+- **Headers**: `Authorization: Bearer <token>`
+- **Body**:
+  ```json
+  {
+    "school": "Stanford University",
+    "degree": "Master's Degree",
+    "major": "Computer Science",
+    "year": "2024-2026",
+    "gpa": "3.9"
+  }
+  ```
+
+### Delete Student Education
+- **URL**: `DELETE /api/student-educations/:id`
+- **Headers**: `Authorization: Bearer <token>`
+
+### Get Public Student Educations
+- **URL**: `GET /api/student-educations/public/:userId`
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "_id": "education_id",
+        "userId": "user_id",
+        "school": "Stanford University",
+        "degree": "Bachelor's Degree",
+        "major": "Computer Science",
+        "year": "2020-2024",
+        "gpa": "3.8",
+        "createdAt": "2023-01-01T00:00:00.000Z",
+        "updatedAt": "2023-01-01T00:00:00.000Z"
+      }
+    ]
+  }
+  ```
+
+## Student Experience
+
+### Create Student Experience
+- **URL**: `POST /api/student-experiences/`
+- **Headers**: `Authorization: Bearer <token>`
+- **Body**:
+  ```json
+  {
+    "company": "Google Inc.",
+    "role": "Software Engineer Intern",
+    "startDate": "2023-06-01",
+    "endDate": "2023-12-01",
+    "desc": "Worked on developing scalable web applications",
+    "duration": "6 months"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Experience record created successfully",
+    "data": {
+      "_id": "experience_id",
+      "userId": "user_id",
+      "company": "Google Inc.",
+      "role": "Software Engineer Intern",
+      "startDate": "2023-06-01T00:00:00.000Z",
+      "endDate": "2023-12-01T00:00:00.000Z",
+      "desc": "Worked on developing scalable web applications",
+      "duration": "6 months",
+      "createdAt": "2023-01-01T00:00:00.000Z",
+      "updatedAt": "2023-01-01T00:00:00.000Z"
+    }
+  }
+  ```
+
+### Get My Student Experiences
+- **URL**: `GET /api/student-experiences/my`
+- **Headers**: `Authorization: Bearer <token>`
+
+### Get Student Experience by ID
+- **URL**: `GET /api/student-experiences/:id`
+- **Headers**: `Authorization: Bearer <token>`
+
+### Update Student Experience
+- **URL**: `PUT /api/student-experiences/:id`
+- **Headers**: `Authorization: Bearer <token>`
+- **Body**:
+  ```json
+  {
+    "company": "Microsoft Corp.",
+    "role": "Senior Software Engineer",
+    "startDate": "2024-01-15",
+    "endDate": "Present",
+    "desc": "Leading development of cloud infrastructure",
+    "duration": "Ongoing"
+  }
+  ```
+
+### Delete Student Experience
+- **URL**: `DELETE /api/student-experiences/:id`
+- **Headers**: `Authorization: Bearer <token>`
+
+### Get Public Student Experiences
+- **URL**: `GET /api/student-experiences/public/:userId`
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "_id": "experience_id",
+        "userId": "user_id",
+        "company": "Google Inc.",
+        "role": "Software Engineer Intern",
+        "startDate": "2023-06-01T00:00:00.000Z",
+        "endDate": "2023-12-01T00:00:00.000Z",
+        "desc": "Worked on developing scalable web applications",
+        "duration": "6 months",
+        "createdAt": "2023-01-01T00:00:00.000Z",
+        "updatedAt": "2023-01-01T00:00:00.000Z"
+      }
+    ]
+  }
+  ```
+
+## Student Projects
+
+### Create Student Project
+- **URL**: `POST /api/student-projects/`
+- **Headers**: `Authorization: Bearer <token>`
+- **Form Data**:
+  - `projectImage` (file, optional)
+  - `projectName` (text)
+  - `description` (text)
+  - `technologies` (text)
+  - `projectUrl` (text)
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Project record created successfully",
+    "data": {
+      "_id": "project_id",
+      "userId": "user_id",
+      "title": "E-commerce Platform",
+      "desc": "A full-featured online shopping platform",
+      "tech": "React, Node.js, MongoDB",
+      "link": "https://github.com/user/project",
+      "category": "student-project",
+      "imageUrl": "https://bucket.s3.region.amazonaws.com/elite-cards/student-projects/project-image.jpg",
+      "createdAt": "2023-01-01T00:00:00.000Z",
+      "updatedAt": "2023-01-01T00:00:00.000Z"
+    }
+  }
+  ```
+
+### Get My Student Projects
+- **URL**: `GET /api/student-projects/my`
+- **Headers**: `Authorization: Bearer <token>`
+
+### Get Student Project by ID
+- **URL**: `GET /api/student-projects/:id`
+- **Headers**: `Authorization: Bearer <token>`
+
+### Update Student Project
+- **URL**: `PUT /api/student-projects/:id`
+- **Headers**: `Authorization: Bearer <token>`
+- **Form Data** (optional image update):
+  - `projectImage` (file, optional)
+  - `projectName` (text)
+  - `description` (text)
+  - `technologies` (text)
+  - `projectUrl` (text)
+
+### Delete Student Project
+- **URL**: `DELETE /api/student-projects/:id`
+- **Headers**: `Authorization: Bearer <token>`
+
+### Get Public Student Projects
+- **URL**: `GET /api/student-projects/public/:userId`
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "_id": "project_id",
+        "userId": "user_id",
+        "title": "E-commerce Platform",
+        "desc": "A full-featured online shopping platform",
+        "tech": "React, Node.js, MongoDB",
+        "link": "https://github.com/user/project",
+        "category": "student-project",
+        "imageUrl": "https://bucket.s3.region.amazonaws.com/elite-cards/student-projects/project-image.jpg",
+        "createdAt": "2023-01-01T00:00:00.000Z",
+        "updatedAt": "2023-01-01T00:00:00.000Z"
+      }
+    ]
+  }
+  ```
+
+## Student Skills
+
+### Create Student Skill
+- **URL**: `POST /api/student-skills/`
+- **Headers**: `Authorization: Bearer <token>`
+- **Body**:
+  ```json
+  {
+    "name": "JavaScript",
+    "level": "Advanced"
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Skill created successfully",
+    "data": {
+      "_id": "skill_id",
+      "userId": "user_id",
+      "name": "JavaScript",
+      "level": "Advanced",
+      "createdAt": "2023-01-01T00:00:00.000Z",
+      "updatedAt": "2023-01-01T00:00:00.000Z"
+    }
+  }
+  ```
+
+### Get My Student Skills
+- **URL**: `GET /api/student-skills/my`
+- **Headers**: `Authorization: Bearer <token>`
+
+### Get Student Skill by ID
+- **URL**: `GET /api/student-skills/:id`
+- **Headers**: `Authorization: Bearer <token>`
+
+### Update Student Skill
+- **URL**: `PUT /api/student-skills/:id`
+- **Headers**: `Authorization: Bearer <token>`
+- **Body**:
+  ```json
+  {
+    "name": "JavaScript",
+    "level": "Expert"
+  }
+  ```
+
+### Delete Student Skill
+- **URL**: `DELETE /api/student-skills/:id`
+- **Headers**: `Authorization: Bearer <token>`
+
+### Get Public Student Skills
+- **URL**: `GET /api/student-skills/public/:userId`
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "data": [
+      {
+        "_id": "skill_id",
+        "userId": "user_id",
+        "name": "JavaScript",
+        "level": "Advanced",
+        "createdAt": "2023-01-01T00:00:00.000Z",
+        "updatedAt": "2023-01-01T00:00:00.000Z"
+      }
+    ]
+  }
+  ```
+
+## Inquiries
+
+### Submit Inquiry
+- **URL**: `POST /api/inquiries/`
+- **Body**:
+  ```json
+  {
+    "fullName": "John Doe",
+    "email": "john.doe@example.com",
+    "phone": "+1234567890",
+    "message": "I'm interested in your services."
+  }
+  ```
+- **Response**:
+  ```json
+  {
+    "success": true,
+    "message": "Inquiry submitted successfully",
+    "data": {
+      "_id": "inquiry_id",
+      "fullName": "John Doe",
+      "email": "john.doe@example.com",
+      "phone": "+1234567890",
+      "message": "I'm interested in your services.",
+      "createdAt": "2023-01-01T00:00:00.000Z",
+      "updatedAt": "2023-01-01T00:00:00.000Z"
+    }
+  }
+  ```
+
+### Get All Inquiries
+- **URL**: `GET /api/inquiries/`
+- **Headers**: `Authorization: Bearer <token>` (Admin only)
+
+### Get Inquiry by ID
+- **URL**: `GET /api/inquiries/:id`
+- **Headers**: `Authorization: Bearer <token>` (Admin only)
+
+### Delete Inquiry
+- **URL**: `DELETE /api/inquiries/:id`
+- **Headers**: `Authorization: Bearer <token>` (Admin only)
+
 ## Admin Features
 
 Admin users can access all client data and perform administrative operations:
@@ -585,6 +1187,13 @@ Admin users can access all client data and perform administrative operations:
 - **Testimonials**: `GET /api/testimonials/`, `GET /api/testimonials/:id/admin`, `PUT /api/testimonials/:id/admin`, `DELETE /api/testimonials/:id/admin`
 - **Appointments**: `GET /api/appointments/`, `GET /api/appointments/:id/admin`, `PUT /api/appointments/:id/admin`, `DELETE /api/appointments/:id/admin`
 - **Profiles**: `GET /api/profile/`, `GET /api/profile/:id`, `PUT /api/profile/:id`, `DELETE /api/profile/:id`
+- **Student Profiles**: `GET /api/student-profiles/`, `GET /api/student-profiles/:id`, `PUT /api/student-profiles/:id`, `DELETE /api/student-profiles/:id`
+- **Student Achievements**: `GET /api/student-achievements/`, `GET /api/student-achievements/:id/admin`, `PUT /api/student-achievements/:id/admin`, `DELETE /api/student-achievements/:id/admin`
+- **Student Educations**: `GET /api/student-educations/`, `GET /api/student-educations/:id/admin`, `PUT /api/student-educations/:id/admin`, `DELETE /api/student-educations/:id/admin`
+- **Student Experiences**: `GET /api/student-experiences/`, `GET /api/student-experiences/:id/admin`, `PUT /api/student-experiences/:id/admin`, `DELETE /api/student-experiences/:id/admin`
+- **Student Projects**: `GET /api/student-projects/`, `GET /api/student-projects/:id/admin`, `PUT /api/student-projects/:id/admin`, `DELETE /api/student-projects/:id/admin`
+- **Student Skills**: `GET /api/student-skills/`, `GET /api/student-skills/:id/admin`, `PUT /api/student-skills/:id/admin`, `DELETE /api/student-skills/:id/admin`
+- **Inquiries**: `GET /api/inquiries/`, `GET /api/inquiries/:id`, `DELETE /api/inquiries/:id`
 - **Mail**: `POST /api/mail/send-single`, `POST /api/mail/send-group`, `GET /api/mail/`, `GET /api/mail/:id`
 
 ## Error Handling
